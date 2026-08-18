@@ -1,0 +1,1006 @@
+\documentclass[UTF8,a4paper,12pt]{ctexart}
+
+% ==================== 宏包 ====================
+\usepackage{geometry}
+\geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs,tabularx,array,multirow,longtable}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{xurl}
+\usepackage{gbt7714}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{fancyhdr}
+
+% ==================== 基本版式 ====================
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\linespread{1.25}
+\captionsetup{font=small,labelsep=quad}
+\numberwithin{equation}{section}
+
+% 正文页右上角队伍控制号
+\newcommand{\TeamControlNumber}{TJMML2026393}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[R]{\small 队伍控制号：\TeamControlNumber}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\floatname{algorithm}{算法}
+
+
+% ---------- 只需修改的基本信息 ----------
+\newcommand{\PaperTitle}{低空经济背景下的多无人机协同巡检路径优化}
+
+% ---------- 正文版式 ----------
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\linespread{1.30}
+\setlength{\abovedisplayskip}{8pt plus 2pt minus 2pt}
+\setlength{\belowdisplayskip}{8pt plus 2pt minus 2pt}
+
+\captionsetup{font=small,labelsep=quad}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+
+% 一级标题用“一、二、三”，二级及以下用“1.1、1.1.1”。
+\renewcommand{\thesection}{\chineseSection{section}}
+\newcommand{\chineseSection}[1]{%
+  \ifcase\value{#1}\or 一\or 二\or 三\or 四\or 五\or 六\or 七\or 八\or 九\or 十\or 十一\or 十二\else\arabic{#1}\fi}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+
+
+% ---------- 页眉页脚 ----------
+% 摘要页和目录页：只显示页脚居中页码。
+\fancypagestyle{frontmatter}{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+% 正文、参考文献、AI 披露和附录：右上角显示队伍控制号。
+\fancypagestyle{mainmatter}{
+  \fancyhf{}
+  \fancyhead[R]{\small 队伍控制号：\TeamControlNumber}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% ---------- 公式、代码和占位内容 ----------
+\numberwithin{equation}{section}
+
+\lstdefinestyle{paperstyle}{
+  basicstyle=\ttfamily\small,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  columns=fullflexible,
+  keywordstyle=\color{blue!65!black},
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{orange!60!black}
+}
+\lstset{style=paperstyle}
+
+\newcommand{\placeholder}[1]{\noindent\textcolor{gray}{【#1】}}
+
+\begin{document}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% =============================================================
+% 第 1 页：摘要页（不得出现姓名、学院等身份信息；不得超过一页）
+% =============================================================
+\pagestyle{frontmatter}
+\thispagestyle{frontmatter}
+
+\begin{center}
+  \vspace*{0.7cm}
+  {\bfseries\fontsize{20pt}{28pt}\selectfont \PaperTitle\par}
+  \vspace{0.9cm}
+  {\bfseries\fontsize{16pt}{22pt}\selectfont 摘\quad 要\par}
+\end{center}
+
+\vspace{0.35cm}
+
+针对不同等级巡检点需要重复访问、同一架无人机不能通过原地停留重复计数以及临时管制区随时间生效的多无人机协同巡检问题，本文将每次有效巡检转化为独立任务副本，建立由机队规模、系统完成时间和单机工时均衡性构成的递进式路径优化模型。
+
+对于问题一，将任务建模为带重复巡检与最大工时约束的 Min--Max 多旅行商问题，利用总服务时间和最小生成树构造机队规模下界，再结合加权 K-means、极角扫描、合法插入、2-opt 与模拟退火搜索闭合路线。四个算例当前采用的无人机数量分别为 $4,2,5,4$ 架，对应最长工作时间分别为 $8.6111,7.5890,8.2876,8.6263$ h，均满足9小时限制。其中 Case 2 和 Case 4 的可行数量与理论下界相等，机队规模达到理论最小值；Case 1 和 Case 3 的结果为当前已验证的最小可行候选。
+
+对于问题二，固定问题一采用的机队规模，并约束总体完成时间不劣于问题一方案，通过重载路线任务迁移、跨路线交换和 2-opt 重新分配实际工作量。四个算例的单机工时极差分别降至 $0.0174,0.0103,0.0238,0.0077$ h，较问题一分别下降 $72.1\%,9.7\%,41.8\%,62.6\%$，且未通过额外等待制造表面均衡。
+
+对于问题三，以8:00为时间原点，在固定机队规模下建立圆形管制区的时空联合约束，构造时变可见图，同时比较安全等待与空间绕飞，并采用 $\varepsilon$-约束两阶段算法依次优化总体完成时间和工时极差。四个算例所得最长工作时间分别为 $8.6111,13.1404,9.6280,10.9250$ h；其中 Case 2 的必要等待由基准算法的 $189.297$ min 降至 $47.645$ min。全部正式方案及机队规模敏感性结果均通过独立逐事件复核。本文所得数值为给定计算预算内的最好可行结果，不将启发式搜索结果表述为已经证明的全局最优解。
+
+\vspace{0.45cm}
+\noindent\textbf{关键词：}多无人机协同巡检；Min--Max 多旅行商问题；负载均衡；时变可见图；词典序优化
+\vspace{0.45cm}
+
+% =============================================================
+% 第 2 页：目录页
+% =============================================================
+\clearpage
+\pagestyle{frontmatter}
+\thispagestyle{frontmatter}
+
+\begingroup
+  \setcounter{tocdepth}{2}
+  \renewcommand{\contentsname}{目\quad 录}
+  \tableofcontents
+\endgroup
+
+% =============================================================
+% 第 3 页起：正文；从本页开始右上角显示队伍控制号
+% =============================================================
+\clearpage
+\pagestyle{mainmatter}
+\thispagestyle{mainmatter}
+
+\section{问题重述}
+\subsection{问题背景}
+低空经济的发展使无人机逐渐应用于分散设施和低空航路的日常巡检。与单次访问问题不同，本题的巡检点具有不同等级，对应不同的重复巡检次数；无人机必须从同一基地出发并返回，且同一架无人机不能通过在原地连续停留重复计数。实际执行中还会出现带有生效时段的临时圆形飞行管制区，使路线可行性同时受到空间位置和通过时刻的影响。因此，需要在有限工作时间和动态管制条件下，统筹机队规模、任务分配、访问顺序与工作负载均衡。
+
+\subsection{问题要求}
+问题一根据附件一给出的四组巡检点坐标和等级，在9小时内完成全部有效巡检并返回基地，确定各算例采用的无人机数量和协同路线，使机队规模及系统总体完成时间尽可能小。问题二固定问题一采用的机队规模，在不恶化总体完成时间的条件下重新分配任务和调整访问顺序，缩小无人机之间的工作时间极差。问题三进一步结合附件二给出的圆形管制区及生效时间窗，在固定正式机队规模下设计满足动态管制的路线，优先控制总体完成时间并改善负载均衡，同时输出详细调度方案及机队规模敏感性结果。
+
+\section{问题分析}
+\subsection{问题一分析}
+问题一的核心是无人机数量与最长工作时间之间的层级关系：增加无人机通常可以缩短完成时间，但题目首先要求尽可能少的机队规模。本文将不同等级的重复巡检要求展开为独立任务副本，删除同一物理点任务副本之间的连续访问弧，并以 $\operatorname{lexmin}(N,T_{\max})$ 表示优先级。求解时先利用服务工作量和最小生成树计算数量下界，再从下界出发搜索9小时内可行的闭合路线；固定候选数量后，通过多起点构造、合法插入、2-opt 和模拟退火改进最长路线，并由独立程序复算任务次数和工作时间。
+
+\subsection{问题二分析}
+问题二在问题一调度模型的基础上进一步考虑无人机工作负载的均衡性。问题一以无人机数量和系统总体完成时间为主要目标，但仅优化最大工作时间 \(T_{\max}\) 主要关注最后返回基地的无人机，不能充分反映不同无人机之间的工时差异。因此，问题二固定问题一最终采用的无人机数量，允许重新调整任务分配与访问顺序，引入最短工作时间 \(T_{\min}\) 和工作时间极差
+\(\delta=T_{\max}-T_{\min}\)，并要求新方案的总体完成时间不劣于问题一方案。由此，前两问的整体目标可写为
+\(\operatorname{lexmin}(N,T_{\max},\delta)\)。求解时以问题一调度方案为初始解，通过重载路线向轻载路线的任务迁移、路线间任务交换、2-opt 和模拟退火搜索均衡方案。
+
+\subsection{问题三分析}
+问题三在前两问任务副本、基地闭合和有效巡检规则的基础上，引入具有确定生效时段的圆形飞行管制区，因此路径是否可行不仅取决于空间位置，还取决于无人机通过相应航段的实际时刻。本文以8:00为统一时间原点，将管制时刻换算为相对分钟数，通过线段--圆盘相交和时间窗重叠联合判断航段可行性。为保持三问之间的递进关系，正式方案固定采用问题一最终确定的机队规模 $N_0$，先控制系统总体完成时间，再在近似最优效率范围内改善工作负载均衡性；不同机队规模的结果仅用于敏感性分析。
+
+\section{模型假设}
+结合题目条件和实际巡检过程，作如下假设：
+
+\begin{enumerate}[label=\arabic*.]
+  \item 所有无人机型号与性能相同，均以题设速度匀速飞行，忽略起飞、降落及加减速过程所需时间；
+  \item 将基地和巡检点视为同一平面内的点，飞行距离按欧氏距离计算，不考虑地形高度、风速等因素的影响；
+  \item 每次有效巡检的作业时间均为 $5\,\mathrm{min}$，不因巡检点等级和执行无人机的不同而改变；
+  \item 忽略无人机之间的碰撞、通信干扰及同一巡检点的作业容量限制，各架无人机可以独立并行执行任务；
+  \item 在任务执行过程中无人机不发生故障，除题目规定的时间要求外，不额外考虑电池容量、充电和维护问题；
+  \item 附件中巡检点及动态管制区的数据准确有效，问题三中各管制区严格按照给定时刻出现和解除，不考虑其他临时变化。
+\end{enumerate}
+
+\section{主要符号说明}
+本文使用的主要符号及其含义见表~\ref{tab:main-symbols}，其余仅在局部模型中使用的符号均在首次出现时说明。
+
+\begin{table}[H]
+  \centering
+  \caption{主要符号及含义}
+  \label{tab:main-symbols}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{c p{10.0cm}}
+    \toprule
+    符号 & 含义 \\
+    \midrule
+    $N$ & 投入使用的无人机数量 \\
+    $N_0$ & 问题三正式方案采用的机队规模 \\
+    $r_i$ & 巡检点 $i$ 所需的巡检次数 \\
+    $U$ & 全部巡检任务副本构成的集合 \\
+    $d_{ij}$ & 巡检点 $i$ 与巡检点 $j$ 之间的实际距离 \\
+    $T_k$ & 第 $k$ 架无人机的工作时间 \\
+    $T_{\max}$ & 所有无人机工作时间的最大值 \\
+    $T_{\min}$ & 所有无人机工作时间的最小值 \\
+    $\delta$ & 无人机工作时间极差，$\delta=T_{\max}-T_{\min}$ \\
+    $\boldsymbol c_r$ & 第 $r$ 个动态管制圆的圆心 \\
+    $R_r$ & 第 $r$ 个动态管制圆的半径 \\
+    $[\alpha_r,\beta_r)$ & 第 $r$ 个动态管制区的生效时间区间 \\
+    $\mathcal F_{ij}$ & 航段 $(i,j)$ 的禁用出发时刻集合 \\
+    $A_{ij}(t)$ & 时刻 $t$ 从节点 $i$ 出发至节点 $j$ 的最早到达时刻 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{问题一的模型建立与求解}
+
+\subsection{模型建立}
+
+问题一要求多架同型无人机从基地同时出发，在9小时内完成全部巡检任务并返回基地。由于不同等级巡检点需要被访问不同次数，且同一架无人机只有在离开某点后再次返回才能形成新的有效巡检，因此，本题可归结为一类具有重复巡检任务、单基地、同型无人机和最大工作时间约束的 Min--Max 多旅行商问题。
+
+普通多旅行商问题主要研究如何将全部任务分配给多条由基地出发并返回基地的路径，而 Min--Max 多旅行商问题进一步以最长路径或最长工作时间为优化目标，从而尽可能提前全部任务的最终完成时刻\cite{guo2024}。本题中的无人机数量并非预先给定，因此采用先最小化车辆数量、再优化路径代价的两阶段思想\cite{bent2004,mouthuy2015}，将总体目标表示为
+
+\begin{equation}
+  \operatorname{lexmin}\left(N,T_{\max}\right).
+  \label{eq:q1-lex-objective}
+\end{equation}
+
+其中，\(N\) 为投入使用的无人机数量，\(T_{\max}\) 为全部无人机工作时间的最大值。无人机数量具有绝对优先级，只有在 \(N\) 取到最小可行值后，才继续优化 \(T_{\max}\)。因此，本文不采用
+\(\min \alpha N+\beta T_{\max}\) 的加权目标，以避免因权重设置不当而通过增加无人机数量缩短完成时间。
+
+\noindent\textbf{任务副本化与有效巡检规则。}
+设全部物理巡检点构成集合 \(V=\{1,2,\ldots,n\}\)，基地记为节点 \(0\)，其坐标为
+\((x_0,y_0)=(0,0)\)。根据巡检等级，点 \(i\) 所需的巡检次数为
+
+\[
+r_i=
+\begin{cases}
+  3, & i\text{ 为 I 级巡检点},\\
+  2, & i\text{ 为 II 级巡检点},\\
+  1, & i\text{ 为 III 级巡检点},
+\end{cases}
+\qquad
+M=\sum_{i\in V}r_i.
+\]
+
+其中，\(M\) 表示全部巡检任务数。为区分同一物理点上的多次巡检，将每次巡检要求转化为一个独立任务副本。对于物理巡检点 \(i\)，建立副本集合
+\(U_i=\{(i,1),(i,2),\ldots,(i,r_i)\}\)；全部任务副本构成集合
+\(U=\bigcup_{i\in V}U_i\)，且有 \(|U|=M\)。
+
+定义映射 \(p(u)\) 表示任务副本 \(u\) 对应的物理巡检点。例如，若点7为 I 级巡检点，则将其展开为
+\((7,1),(7,2),(7,3)\) 三个任务副本。不同副本可以分配给同一架或不同无人机，模型不设置同一时刻只能有一架无人机访问某点的互斥约束。
+
+同一架无人机不能通过原地停留重复完成同一物理点的多个任务副本。令扩展节点集合为
+\(\bar U=U\cup\{0\}\)，定义可行有向弧集合为
+
+\begin{equation}
+  \mathcal A=
+  \left\{
+  (u,v)\in\bar U\times\bar U:
+  u\neq v,\
+  \neg\left(u,v\in U\text{ 且 }p(u)=p(v)\right)
+  \right\}.
+  \label{eq:q1-arc-set}
+\end{equation}
+
+式 \eqref{eq:q1-arc-set} 删除了同一物理点不同任务副本之间的直接连接。例如，路线
+\(0\rightarrow7^{(1)}\rightarrow7^{(2)}\rightarrow0\)
+不合法，而路线
+\(0\rightarrow7^{(1)}\rightarrow12^{(1)}
+\rightarrow7^{(2)}\rightarrow0\)
+合法。因此，该规则只禁止同一架无人机在原地连续重复计数，不禁止其离开后再次返回，也不限制不同无人机分别完成同一点的巡检任务。
+
+\noindent\textbf{距离和工作时间。}
+附件中的坐标每1个单位对应实际距离100 m，即 \(0.1\text{ km}\)，因此物理巡检点
+\(i\) 与 \(j\) 之间的实际欧氏距离为
+\(d_{ij}=0.1\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}\text{ km}\)。
+令 \(p(0)=0\)，则对于任意可行弧 \((u,v)\in\mathcal A\)，其飞行距离为
+\(d_{uv}=d_{p(u),p(v)}\)，按照无人机巡航速度 \(55\text{ km/h}\) 计算，相应飞行时间为
+\(\tau_{uv}=d_{uv}/55\)。每完成一个任务副本需要5分钟巡检作业，因此单次服务时间为
+\(t_s=5/60=1/12\text{ h}\)。I、II、III级巡检点分别展开为3、2、1个任务副本。附件坐标和管制圆半径采用同一坐标尺度；程序计算时始终保留完整浮点精度，仅在结果表中将工作时间保留4位小数，返回时刻则由未舍入的秒级结果换算得到。
+
+设无人机 \(k\) 的路线为
+\(R_k=(0,u_1,u_2,\ldots,u_{m_k},0)\)，其中 \(m_k\) 为该无人机完成的任务副本数量，则其工作时间为
+
+\begin{equation}
+  T_k=
+  \frac{1}{55}
+  \left(
+  d_{0u_1}
+  +\sum_{q=1}^{m_k-1}d_{u_q u_{q+1}}
+  +d_{u_{m_k}0}
+  \right)
+  +\frac{m_k}{12}.
+  \label{eq:q1-route-time}
+\end{equation}
+
+式 \eqref{eq:q1-route-time} 的第一项为飞行时间，第二项为全部任务副本的服务时间。即使多个任务副本对应同一物理点，每完成一次有效巡检仍需单独计入5分钟服务时间。
+
+由于所有无人机同时起飞，最后一架无人机返回基地的时刻即为全部任务的完成时刻。因此，
+
+\begin{equation}
+  T_{\max}=\max_{k=1,\ldots,N}T_k,
+  \qquad
+  T_k\leq9\quad(\forall k).
+  \label{eq:q1-makespan}
+\end{equation}
+
+\noindent\textbf{无人机数量理论下界。}
+全部 \(M\) 个任务副本必然产生 \(M/12\) 小时的服务时间。由于每架无人机最多工作9小时，仅考虑服务时间即可得到
+\(N\geq\lceil M/108\rceil\)。
+
+进一步将基地与所有不同物理巡检点构成完全无向图，并以实际欧氏距离 \(d_{ij}\) 为边权。设该图的最小生成树长度为 \(L_{\mathrm{MST}}\)。任意能够完成全部任务的无人机路线集合，其飞行边的并集必须将基地与所有巡检点连接起来，故总飞行距离不小于 \(L_{\mathrm{MST}}\)。由此得到全部无人机总工作量下界
+\(W_{\mathrm{LB}}=M/12+L_{\mathrm{MST}}/55\)，以及无人机数量理论下界
+
+\begin{equation}
+  N_{\mathrm{LB}}
+  =
+  \left\lceil
+  \frac{
+  \dfrac{M}{12}
+  +
+  \dfrac{L_{\mathrm{MST}}}{55}
+  }{9}
+  \right\rceil.
+  \label{eq:q1-drone-lower-bound}
+\end{equation}
+
+此外，至少有一架无人机需要到达距离基地最远的巡检点并返回。结合最远点下界和平均工作量下界，给定无人机数量 \(N\) 时有
+
+\begin{equation}
+  T_{\max}^{\mathrm{LB}}(N)
+  =
+  \max
+  \left\{
+  \frac{W_{\mathrm{LB}}}{N},
+  \max_{i\in V}
+  \left(
+  \frac{2d_{0i}}{55}+\frac{1}{12}
+  \right)
+  \right\}.
+  \label{eq:q1-tmax-lower-bound}
+\end{equation}
+
+若 \(T_{\max}^{\mathrm{LB}}(N)>9\)，则 \(N\) 架无人机一定无法完成任务；若该下界不超过9小时，则只能说明当前数量尚未被理论下界排除，不能据此直接判定其一定可行。
+
+\noindent\textbf{固定无人机数量的数学规划模型。}
+给定候选无人机数量 \(N\)，令无人机集合为 \(K=\{1,2,\ldots,N\}\)。定义二元变量 \(y_u^k\) 表示任务副本 \(u\) 是否由无人机 \(k\) 完成，二元变量 \(x_{uv}^k\) 表示无人机 \(k\) 是否沿可行弧 \((u,v)\) 飞行，即
+
+\[
+y_u^k=
+\begin{cases}
+1, & \text{任务副本 }u\text{ 由无人机 }k\text{ 完成},\\
+0, & \text{否则},
+\end{cases}
+\qquad
+x_{uv}^k=
+\begin{cases}
+1, & \text{无人机 }k\text{ 沿弧 }(u,v)\text{ 飞行},\\
+0, & \text{否则}.
+\end{cases}
+\]
+
+每个任务副本必须且只能由一架无人机完成；若任务副本被分配给某架无人机，则该无人机必须恰好进入并离开该任务一次；同时，每架投入使用的无人机只能从基地出发和返回一次。上述条件统一写为
+
+\begin{equation}
+\begin{aligned}
+  &\sum_{k\in K}y_u^k=1,
+  &&u\in U,\\
+  &\sum_{v:(v,u)\in\mathcal A}x_{vu}^k=y_u^k,
+  &&u\in U,\ k\in K,\\
+  &\sum_{v:(u,v)\in\mathcal A}x_{uv}^k=y_u^k,
+  &&u\in U,\ k\in K,\\
+  &\sum_{v:(0,v)\in\mathcal A}x_{0v}^k=1,
+  \qquad
+  \sum_{u:(u,0)\in\mathcal A}x_{u0}^k=1,
+  &&k\in K.
+\end{aligned}
+\label{eq:q1-route-constraints}
+\end{equation}
+
+仅设置出入度约束仍可能产生不经过基地的独立子回路。为此，引入非负单商品流变量 \(f_{uv}^k\)。每个被无人机 \(k\) 完成的任务副本消耗一个单位任务流，而基地发出与该无人机承担任务数量相等的总流量：
+
+\begin{equation}
+\begin{aligned}
+  &0\leq f_{uv}^k\leq Mx_{uv}^k,
+  &&(u,v)\in\mathcal A,\ k\in K,\\
+  &\sum_{v:(v,u)\in\mathcal A}f_{vu}^k
+  -
+  \sum_{v:(u,v)\in\mathcal A}f_{uv}^k
+  =y_u^k,
+  &&u\in U,\ k\in K,\\
+  &\sum_{v:(0,v)\in\mathcal A}f_{0v}^k
+  -
+  \sum_{u:(u,0)\in\mathcal A}f_{u0}^k
+  =
+  \sum_{u\in U}y_u^k,
+  &&k\in K.
+\end{aligned}
+\label{eq:q1-flow-constraints}
+\end{equation}
+
+该约束组可以排除与基地不连通的任务子回路，保证每架无人机形成一条完整的基地闭合路线。
+
+在数学规划模型中，无人机 \(k\) 的工作时间、总体完成时间和9小时限制统一表示为
+
+\begin{equation}
+\begin{aligned}
+  T_k
+  &=
+  \sum_{(u,v)\in\mathcal A}\tau_{uv}x_{uv}^k
+  +\frac{1}{12}\sum_{u\in U}y_u^k,
+  &&k\in K,\\
+  T_k&\leq C_{\max},
+  &&k\in K,\\
+  C_{\max}&\leq9.
+\end{aligned}
+\label{eq:q1-time-constraints}
+\end{equation}
+
+其中，\(C_{\max}\) 表示系统总体完成时间。固定无人机数量 \(N\) 后，模型以
+\(\min C_{\max}\) 为目标。记固定 \(N\) 时得到的最优目标值为
+\(C^*(N)=\min\max_{k\in K}T_k\)，则真正的最小无人机数量定义为
+
+\begin{equation}
+  N_{\min}
+  =
+  \min
+  \left\{
+  N\in\mathbb Z_+:
+  C^*(N)\leq9
+  \right\},
+  \qquad
+  N_{\mathrm{LB}}\leq N_{\min}.
+  \label{eq:q1-n-min}
+\end{equation}
+
+若在 \(N=N_{\mathrm{LB}}\) 时找到满足9小时约束的可行方案，则上下界相等，可以严格确定最小无人机数量；若找到的可行数量大于理论下界，则还需证明更小数量不可行，才能严格认定该数量为 \(N_{\min}\)。
+
+\subsection{求解方法}
+
+\noindent\textbf{（1）求解流程与初始解。}
+问题一按照式~\eqref{eq:q1-lex-objective} 的优先关系分两阶段求解：先从数量下界 \(N_{\mathrm{LB}}\) 出发搜索满足9小时限制的无人机数量，再固定 \(N\) 优化最大工作时间 \(T_{\max}\)。对每个给定的 \(N\)，程序采用多个随机起点，交替使用加权 K-means 和极角扫描划分任务区域，并以最近邻法和 2-opt 构造各区域的初始闭合路线。对于重复巡检任务，按式~\eqref{eq:q1-insertion-cost} 计算插入增量，并排除与同一物理点相邻的位置：
+
+\begin{equation}
+  \Delta d=d_{ai}+d_{ib}-d_{ab}.
+  \label{eq:q1-insertion-cost}
+\end{equation}
+
+由此得到满足巡检次数要求且不存在同点连续访问的初始方案。数量搜索的总体过程如图~\ref{fig:q1-fleet-flow} 所示。
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[
+    width=0.84\textwidth,
+    height=0.40\textheight,
+    keepaspectratio
+  ]{figures/q1_fleet_search_flowchart_revised.pdf}
+  \caption{问题一无人机数量与路径的两阶段搜索流程}
+  \label{fig:q1-fleet-flow}
+\end{figure}
+\FloatBarrier
+
+\noindent\textbf{（2）路线优化与结果校验。}
+在初始方案上，程序通过任务迁移、任务交换和 2-opt 构造邻域，并采用模拟退火搜索降低 \(T_{\max}\)。对使目标值增加 \(\Delta T>0\) 的候选方案，以概率
+
+\begin{equation}
+  P=\exp\left(-\frac{\Delta T}{\tau}\right)
+  \label{eq:q1-sa-probability}
+\end{equation}
+
+予以接受，其中 \(\tau\) 为温度参数。退火结束后，再针对最长路线执行确定性平衡修复，并保留全部随机起点中 \(T_{\max}\) 最小的方案。若当前 \(N\) 找到满足 \(T_{\max}\leq9\) 的路线，则记录结果并继续优化；否则令 \(N\leftarrow N+1\)。最后独立复算各路线，检查巡检次数、同点连续访问、基地闭合和9小时限制，并将详细调度方案写入 \texttt{result1.xlsx}。固定 \(N\) 时的完整优化流程移至附录，见图~\ref{fig:q1-route-flow}。
+
+各算法操作的作用归纳于表~\ref{tab:q1-method-role}。
+
+\begin{table}[H]
+  \centering
+  \caption{问题一各算法操作及其主要作用}
+  \label{tab:q1-method-role}
+  \begin{tabularx}{0.94\textwidth}{>{\centering\arraybackslash}p{3.2cm}X}
+    \toprule
+    算法操作 & 在本题中的主要作用 \\
+    \midrule
+    加权 K-means & 根据空间位置和巡检次数形成地理上较集中的初始任务区域 \\
+    极角扫描 & 从不同方向切分任务点，增加初始路线结构的多样性 \\
+    最近邻与 2-opt & 快速构造闭合路线并减少明显绕行和路线交叉 \\
+    合法贪心插入 & 补充重复巡检任务，同时禁止同一物理点连续出现 \\
+    任务迁移与交换 & 从最长路线向其他路线转移工作量，降低最大工作时间 \\
+    模拟退火与多起点 & 接受少量劣化移动并重复搜索，降低陷入局部最优的可能性 \\
+    确定性平衡修复 & 对当前最好方案进行最后的任务转移、交换和路线缩短 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{结果与解释}
+按照赛题规定的展示格式，四个测试算例的无人机数量及单架无人机最长、最短工作时间见表~\ref{tab:q1-results}。
+
+\begin{table}[H]
+  \centering
+  \caption{问题一无人机数量与完成时间计算结果}
+  \label{tab:q1-results}
+  \begin{tabularx}{0.98\textwidth}{c c >{\centering\arraybackslash}X >{\centering\arraybackslash}X}
+    \toprule
+    测试算例 & 无人机数量 $N$ & 单架无人机最长工作时间 $T_{\max}$（h） & 单架无人机最短工作时间 $T_{\min}$（h） \\
+    \midrule
+    Case 1 & 4 & 8.6111 & 8.5488 \\
+    Case 2 & 2 & 7.5890 & 7.5775 \\
+    Case 3 & 5 & 8.2876 & 8.2468 \\
+    Case 4 & 4 & 8.6263 & 8.6058 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+四个算例均满足 \(T_{\max}<9\text{ h}\)，说明表中方案能够在规定时间内完成全部巡检任务。理论分析得到 Case 1--Case 4 的无人机数量下界依次为3、2、4、4；其中 Case 2 和 Case 4 的计算数量与下界相等，可以确定 \(N_{\min}=2\) 和 \(N_{\min}=4\)。对于 Case 1 和 Case 3，当前结果分别给出4架和5架无人机的调度方案，但启发式算法在给定计算时间内未找到3架和4架方案并不等价于严格不可行，因此只能得到 \(3\leq N_{\min}\leq4\) 和 \(4\leq N_{\min}\leq5\)。此外，表中 \(T_{\max}\) 是多起点搜索得到的当前最好结果，未使用精确求解器证明其为固定 \(N\) 下的全局最优值。
+
+\section{问题二的模型建立与求解}
+\subsection{递进模型与均衡目标}
+
+问题二完整继承问题一的任务副本集合、工作时间计算方法和路径可行性约束，包括每个任务副本恰好完成一次、无人机从基地出发并最终返回基地、同一物理巡检点禁止连续巡检、允许离开后再次返回以及单架无人机工作时间不超过9小时等约束。与问题一不同，问题二不再搜索无人机数量，而是固定
+
+\begin{equation}
+  N=N^{(1)},
+  \qquad
+  N^{(1)}=(4,2,5,4),
+  \label{eq:q2-fixed-n}
+\end{equation}
+
+其中，向量各分量依次对应 Case 1--Case 4。鉴于 Case 1 和 Case 3 的当前数量尚未被严格证明为全局最少数量，本文将 \(N^{(1)}\) 表述为“问题一最终采用的无人机数量”，而不统一记作已经严格证明的 \(N_{\min}\)。
+
+问题二不允许通过人为等待延长较短路线。均衡性改善只来源于任务副本重新分配和访问顺序调整，各无人机工作时间仍仅由飞行时间和有效巡检服务时间组成。主方案同时固定 $N=N^{(1)}$、取 $\varepsilon=0$，即不增加无人机、不放宽问题一当前完成时间，也不人为增加等待。
+
+为刻画实际工作时间的均衡程度，定义
+
+\begin{equation}
+  T_{\max}=\max_{k\in K}T_k,
+  \qquad
+  T_{\min}=\min_{k\in K}T_k,
+  \qquad
+  \delta=T_{\max}-T_{\min}.
+  \label{eq:q2-delta}
+\end{equation}
+
+由于恒有 \(T_{\max}\geq T_{\min}\)，题目中的绝对值可直接写成式~\eqref{eq:q2-delta}。车辆路径均衡问题中常以最长路线时间或最长、最短路线时间之差衡量工作负载差异\cite{matl2018,lehuedepeton2020}。本文采用“实际工作时间极差”，而不是任务数量差或飞行距离差。引入辅助变量 \(U,L\)，可将其线性表示为
+
+\begin{equation}
+\begin{aligned}
+  U&\geq T_k, &&k\in K,\\
+  L&\leq T_k, &&k\in K,\\
+  \delta&=U-L.
+\end{aligned}
+\label{eq:q2-balance-variables}
+\end{equation}
+
+在最小化 \(\delta\) 时，最优解处有 \(U=T_{\max}\)、\(L=T_{\min}\)。但若只最小化极差，可能通过牺牲总体完成时间获得表面上的均衡。为保持问题一的优先目标，设
+
+\begin{equation}
+  C_{\mathrm{ref}}=T_{\max}^{(1)},
+  \qquad
+  T_{\max}^{(2)}\leq C_{\mathrm{ref}}+\varepsilon.
+  \label{eq:q2-epsilon-constraint}
+\end{equation}
+
+主方案取 \(\varepsilon=0\)，即第二问的总体完成时间不得超过问题一当前最好可行方案。这相当于采用 \(\varepsilon\)-约束思想，在保持主要目标既有水平的条件下优化次级目标\cite{mavrotas2009}。四个算例的 \(C_{\mathrm{ref}}\) 依次为
+
+\[
+  (8.6111,\ 7.5890,\ 8.2876,\ 8.6263)\ \mathrm{h}.
+\]
+
+因此，前两问可以统一表示为
+
+\begin{equation}
+  \operatorname{lexmin}
+  \left(
+    N,T_{\max},\delta,\sum_{k\in K}T_k
+  \right).
+  \label{eq:q2-overall-objective}
+\end{equation}
+
+在第二问中，前两层已由式~\eqref{eq:q2-fixed-n} 和式~\eqref{eq:q2-epsilon-constraint} 固定，故对满足约束的候选方案采用
+
+\begin{equation}
+  F(S)=
+  \left(
+    \delta(S),T_{\max}(S),\sum_{k\in K}T_k(S)
+  \right)
+  \label{eq:q2-candidate-objective}
+\end{equation}
+
+进行词典序比较。总工作时间只作为前三项相同情况下的平局判别，以减少无效绕行。
+
+\subsection{均衡优化算法}
+
+程序直接读取问题一通过独立校验的调度方案 \(S^{(1)}\)，固定 \(N=N^{(1)}\) 并令 \(C_{\mathrm{ref}}=T_{\max}^{(1)}\)。每次迭代先按工作时间识别重载路线与轻载路线，再从重载路线向轻载路线迁移一个任务，或交换两条路线中的任务。发生改变的路线随后执行合法 2-opt，以消除明显绕行。候选方案必须同时满足巡检次数、基地闭合、同点不连续、9小时限制以及 \(T_{\max}\leq C_{\mathrm{ref}}\)，否则直接拒绝。
+
+若候选方案的式~\eqref{eq:q2-candidate-objective} 词典序减小，则予以接受；对少量暂时劣化的方案按照模拟退火概率接受，以降低陷入局部最优的可能性。程序使用多个随机种子重复搜索，最后系统枚举重载路线与轻载路线间的单任务迁移，并对各路线充分执行 2-opt。上述过程不再改变无人机数量，也不重新构造问题一的任务副本模型，重点只在既有完成时间上界内重新分配真实巡检工作量。
+
+需要特别说明的是，本文不允许无人机通过在基地、巡检点或航路中额外等待来增加工作时间。所有方案的等待时间均为0，\(T_k\) 只由实际飞行时间和有效巡检服务时间构成；路线调整后继续执行距离缩短操作。因此，均衡改善来自真实任务的重新分配和访问顺序优化，而不是人为延长短路线。该处理也避免了极差型非单调均衡指标可能诱发非必要绕行的问题\cite{matl2018}。
+
+\subsection{计算结果与分析}
+
+问题二的无人机数量、最大工作时间、最小工作时间和工作时间极差见表~\ref{tab:q2-results}。全部算例均使用问题一最终采用的无人机数量，且满足 \(T_{\max}^{(2)}\leq C_{\mathrm{ref}}<9\mathrm{h}\)。
+
+\begin{table}[H]
+  \centering
+  \caption{问题二结果展示表}
+  \label{tab:q2-results}
+  \begin{tabularx}{0.98\textwidth}{c c >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X}
+    \toprule
+    测试算例 & 无人机数量 $N$ & 单架无人机最长工作时间 $T_{\max}$（h） & 单架无人机最短工作时间 $T_{\min}$（h） & $\delta=|T_{\max}-T_{\min}|$（h） \\
+    \midrule
+    Case 1 & 4 & 8.6111 & 8.5937 & 0.0174 \\
+    Case 2 & 2 & 7.5841 & 7.5737 & 0.0103 \\
+    Case 3 & 5 & 8.2824 & 8.2586 & 0.0238 \\
+    Case 4 & 4 & 8.6197 & 8.6120 & 0.0077 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+为量化均衡改善效果，记问题一、问题二的工作时间极差分别为 \(\delta_1,\delta_2\)，定义极差下降量和下降比例为
+
+\begin{equation}
+  \Delta\delta=\delta_1-\delta_2,
+  \qquad
+  \eta_{\delta}=\frac{\delta_1-\delta_2}{\delta_1}\times100\%.
+  \label{eq:q2-delta-reduction}
+\end{equation}
+
+计算结果见表~\ref{tab:q2-comparison}。
+
+\begin{table}[H]
+  \centering
+  \caption{问题一与问题二工作时间极差对比}
+  \label{tab:q2-comparison}
+  \begin{tabular}{cccc}
+    \toprule
+    测试算例 & $\delta_1$/min & $\delta_2$/min & 下降比例 \\
+    \midrule
+    Case 1 & 3.74 & 1.04 & 72.1\% \\
+    Case 2 & 0.69 & 0.62 & 9.7\% \\
+    Case 3 & 2.45 & 1.43 & 41.8\% \\
+    Case 4 & 1.23 & 0.46 & 62.6\% \\
+    \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \parbox{0.78\textwidth}{\footnotesize 注：极差及下降比例均由程序输出的未舍入数据计算，表中分钟数仅作显示舍入。}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.94\textwidth]{generated_figures/q2_balance_improvement_dumbbell.pdf}
+  \caption{问题一与问题二工作时间极差对比}
+  \label{fig:q2-workload-comparison}
+\end{figure}
+
+由表~\ref{tab:q2-comparison} 和图~\ref{fig:q2-workload-comparison} 可见，问题二所得方案在保持无人机数量不变的基础上，进一步缩小了不同无人机之间的工作时间极差。按照程序输出的未舍入数据计算，Case 1、Case 3 和 Case 4 的极差分别下降72.1\%、41.8\%和62.6\%；Case 2 在问题一中已经较为均衡，极差仍由约0.69分钟下降至0.62分钟，下降9.7\%。优化后四个算例的工作时间极差均不超过1.43分钟，说明所构造方案具有较好的负载均衡性。与此同时，Case 2--Case 4 的 \(T_{\max}\) 还略有下降，Case 1 保持原完成时间上界，说明均衡改善没有以牺牲总体完成时间为代价。
+
+正文不逐行展开较长的巡检点序列。四个算例中每架无人机的基地闭合路线、飞行距离、巡检次数和工作时间均保存在支撑材料 \texttt{result2.xlsx}，可复算的完整结构化路线保存在 \texttt{q2\_solution.json}；相应程序入口为 \texttt{q2\_solver.py}。
+
+\section{问题三的模型建立与求解}
+\subsection{模型建立}
+
+问题三并非管制信息随机到达的在线调度，而是在管制区域及其生效时段均预先已知的条件下，对前两问模型增加绝对时刻和时变通行约束，属于确定性时间依赖路径问题\cite{gendreau2015time}。题目未明确说明第三问是否允许重新配置无人机数量；若将机队规模视为不受约束的决策变量，而目标仅为缩短完成时间，则会产生不断增加无人机的退化倾向。为保持三问的递进关系，本文将问题一最终采用的机队规模视为系统已有配置，正式方案固定为 $N_0=(4,2,5,4)$。这是本文用于消除题意歧义的建模约定，并非题目明文规定；增加无人机的结果仅用于第8节敏感性分析。
+
+任务副本、巡检次数、基地往返以及同一物理点不得连续巡检等约束保持不变。以8:00为 $t=0$，若附件钟表时刻为 $h{:}m$，则相对时刻按 $t_{\mathrm{rel}}=60(h-8)+m$ 换算，例如 $8{:}00\mapsto0$、$10{:}30\mapsto150$、$17{:}00\mapsto540$。问题一中的9小时限制只用于确定机队规模，问题三原文未再次规定任务必须在9小时内完成，因此本文不将17:00作为任务截止时刻。17:00仅表示相关动态管制区在该时刻解除，无人机可以在此后继续执行巡检任务并返回基地。
+
+将第 $r$ 个动态圆形管制区记为 $Z_r=(\boldsymbol c_r,R_r,[\alpha_r,\beta_r))$。其中 $\boldsymbol c_r$、$R_r$ 分别为圆心和半径。时间窗采用左闭右开的半开区间：开始时刻 $\alpha_r$ 计入管制，结束时刻 $\beta_r$ 不再计入，从而避免端点重复判定。Case 4 中 $Z_8$ 的开始和结束时刻均为17:00，故其时间窗为 $[540,540)=\varnothing$，不产生实际管制约束；本文不将其解释为“从17:00持续至任务结束”，也不人为补充管制时长。对航段 $(i,j)$，设正常飞行时间为 $\tau_{ij}$，程序解析求得该线段进入、离开圆 $r$ 的参数 $\lambda_{ijr}^{-}$ 与 $\lambda_{ijr}^{+}$。模型中的核心时空约束及通行函数集中写为
+
+\begin{equation}
+\begin{aligned}
+ \boldsymbol p_{ij}(\lambda)&=\boldsymbol p_i+\lambda(\boldsymbol p_j-\boldsymbol p_i),\quad 0\leq\lambda\leq1,\\
+ t+\lambda\tau_{ij}\in[\alpha_r,\beta_r)&\ \Longrightarrow\ 
+ \|\boldsymbol p_{ij}(\lambda)-\boldsymbol c_r\|_2>R_r,\\
+ \mathcal F_{ijr}&=[\alpha_r-\lambda_{ijr}^{+}\tau_{ij},\,\beta_r-\lambda_{ijr}^{-}\tau_{ij}),
+ \quad \mathcal F_{ij}=\bigcup_r\mathcal F_{ijr},\\
+ D_{ij}(t)&=\min\{s\geq t:s\notin\mathcal F_{ij}\},\quad
+ A_{ij}(t)=D_{ij}(t)+\tau_{ij}.
+\end{aligned}
+\label{eq:q3-core-dynamic}
+\end{equation}
+
+式~\eqref{eq:q3-core-dynamic} 表明，一条直线航段在几何上穿过管制圆并不意味着必然违规；只有无人机通过圆内部分的实际时间与管制窗重叠时，才形成时空冲突。当同一航段受多个管制圆影响时，程序将各圆产生的非空禁用区间按开始时刻排序，合并相交或相邻区间后组成 $\mathcal F_{ij}$，再从计划时刻起寻找第一个不属于该集合的出发时刻 $D_{ij}(t)$。
+
+服务过程同样受动态管制约束。设任务 $i$ 的服务开始时刻为 $s_i$、服务时间为 $t_s=5$ min；若 $\|\boldsymbol p_i-\boldsymbol c_r\|_2\leq R_r$，必须满足 $[s_i,s_i+t_s)\cap[\alpha_r,\beta_r)=\varnothing$，即完整5分钟服务区间均须安全，不能只检查到达或服务开始时刻。若原计划航段当前不可通行，则推迟至最早可行出发时刻；若当前节点在计划等待区间内也不安全，则沿既定访问序列向前回溯，将等待前移至最近一个能在整个区间保持安全的已访问节点，并重新递推后续时刻。问题三只允许这种满足管制要求所必需的等待，不允许为了减小 $\delta$ 任意延长短路线；等待时间计入工作时间，在基地等待也从8:00开始计时。图~\ref{fig:q3-principle} 给出了这一联合判定过程。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.90\textwidth]{generated_figures/q3_spatiotemporal_principle.pdf}
+  \caption{航段与动态圆形禁飞区的时空耦合判定}
+  \label{fig:q3-principle}
+\end{figure}
+
+设无人机 $k$ 的节点序列为 $(v_{k,0},\ldots,v_{k,m_k})$，从8:00开始递推到达、服务和离开时刻。其工作时间由实际飞行、有效巡检和必要安全等待组成。由于 $T_k^{\mathrm{fly}}$、$T_k^{\mathrm{service}}$ 以小时计而 $T_k^{\mathrm{wait}}$ 以分钟计，故 $T_k=T_k^{\mathrm{fly}}+T_k^{\mathrm{service}}+T_k^{\mathrm{wait}}/60$。并记 $T_{\max}=\max_kT_k$、$T_{\min}=\min_kT_k$、$\delta=T_{\max}-T_{\min}$。对需要重复巡检的点，程序为每次巡检建立唯一任务副本，从而保证移动、交换后仍能逐一核对任务次数。
+
+\subsection{求解方法}
+
+\noindent\textbf{直飞--等待基准算法A。}
+
+算法A首先读取问题二已通过校验的路线，解析计算直线航段与各管制圆的相交参数及禁用出发区间。给定任务序列后，内层评价器按照访问顺序递推最早可行时刻：航段若在管制生效时穿圆，则在最近的安全节点等待至直飞可行；若目标点的5分钟服务区间与管制窗冲突，则同样将必要等待前移。算法A不增设圆边界绕飞节点，其空间避让依靠调整访问顺序和跨无人机重分配实现，因此属于“直飞--必要等待”的快速基准方法。
+
+外层在任务迁移、跨路线交换和路线片段反转等邻域之间切换，并用多起点模拟退火跳出局部最优，候选解按 $(T_{\max},\delta,\sum_kT_k)$ 的字典序更新。数值计算中每个算例使用5个随机起点，每个起点最多迭代25000次；温度由0.12逐步降至0.002。完成全部随机起点或达到每个算例35秒总时间预算时停止，并输出当前搜索范围内的最好可行方案。算法A的作用是提供稳定、可复算的比较基准，而不是填写第三问的最终表格。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.90\textwidth]{generated_figures/q3_solver_flowchart.pdf}
+  \caption{基准算法A的时间依赖路线求解流程}
+  \label{fig:q3-solver-flow}
+\end{figure}
+
+\medskip
+\noindent\textbf{时变可见图两阶段算法B。}
+
+算法B保留算法A的解析冲突检查和最早时刻递推，并在航段评价中增加空间绕飞选择。记 $n_b$ 为每个有效管制圆的外偏候选节点数，本次取 $n_b=16$；$\rho$ 为附加安全裕度，本次取 $\rho=0$；$\widehat R_r$ 为外偏采样半径。为避免候选节点落在原禁飞边界上，并防止相邻采样点之间的弦切入圆内，程序采用 $\widehat R_r=(R_r+\rho)\sec(\pi/n_b)+10^{-6}$。即使 $\rho=0$，几何外偏量 $R_r[\sec(\pi/16)-1]+10^{-6}$ 仍为正。
+
+本文将管制圆视为闭圆盘，圆周边界同样属于管制区域；几何判断对判别式和点到线段距离采用统一数值容差，相切按接触管制圆处理。候选节点仅用于构造时变可见图，任意两节点间的可见边仍须在原半径 $R_r$ 下通过解析线段--圆盘检查，不满足安全条件的边均予删除。算法同时比较“安全等待后直飞”和“沿外偏节点改道”两类通行方式，并对最终折线路径的每一小段重新进行时空联合验证。由于时变可见图只使用有限个外偏节点，所得路线是连续圆障碍最短路的离散近似，本文不声称其为连续空间中的全局最短路径。
+
+外层搜索除迁移、交换和片段反转外，还加入跨路线片段交换，并将问题二路线、算法A路线及随机扰动路线共同作为初始解。为体现总体完成时间优先，并允许在近似最优效率范围内进一步改善负载均衡性，算法B采用基于 $\varepsilon$-约束的近似字典序两阶段准则
+
+\begin{equation}
+\begin{aligned}
+T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
+\min_{S\in\Omega_3(N_0)}\;&\left(\delta(S),\sum_kT_k(S)\right)
+\quad\text{s.t.}\quad T_{\max}(S)\leq(1+\varepsilon_T)T_{\max}^{B,*},
+\end{aligned}
+\qquad \varepsilon_T=0.005 .
+\label{eq:q3-two-stage}
+\end{equation}
+
+其中 $\Omega_3(N_0)$ 表示固定机队规模且满足全部巡检、基地闭合和动态禁飞约束的可行方案集合。本文取 $\varepsilon_T=0.005$，表示均衡优化只允许总体完成时间相对第一阶段当前最好值增加不超过0.5\%，从而给效率损失设置直观且较严格的上界；该参数是效率与均衡之间的建模取舍，不是数值误差。第二阶段若发现更小的 $T_{\max}$，则立即回代更新 $T_{\max}^{B,*}$ 并重新执行均衡搜索，使效率阈值始终以当前最好完成时间为基准。每个阶段最多迭代1200次，基础搜索每个“算例--机队规模”采用30秒预算；回代最多追加3轮，每轮最多10秒。达到迭代或时间上限，或回代后未再发现更小的 $T_{\max}$ 时停止。最终结果均称为“当前搜索范围内最好可行方案”，不声称已经证明全局最优。
+
+\begin{table}[H]
+  \centering
+  \caption{算法A与算法B的求解机制比较}
+  \label{tab:q3-method-comparison}
+  \small
+  \begin{tabularx}{0.94\textwidth}{c >{\centering\arraybackslash}X >{\centering\arraybackslash}X}
+    \toprule
+    比较内容 & 算法A & 算法B \\
+    \midrule
+    航段方式 & 直飞或安全等待 & 直飞、安全等待或空间绕飞 \\
+    几何结构 & 原任务节点 & 原任务节点与圆外偏置节点 \\
+    动态评价 & 禁用出发区间与时刻递推 & 时变可见图与逐段时刻递推 \\
+    初始解 & 问题二路线 & 问题二路线、算法A路线及随机扰动 \\
+    邻域操作 & 迁移、交换、反转 & 增加跨路线片段交换 \\
+    优化准则 & 字典序基准搜索 & $\varepsilon$-约束两阶段优化 \\
+    论文作用 & 对照基准 & 固定 $N_0$ 的正式方案 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{计算结果与分析}
+
+按照上述约定，第三问正式结果采用算法B在固定机队规模 $N_0=N^{(1)}=(4,2,5,4)$ 下得到的均衡方案，列于表~\ref{tab:q3-results}；该表用于填写赛题所给表4。算法A仅作为基准方法，不同机队规模结果仅作为敏感性分析。表中工作时间从8:00起算，允许在17:00后继续执行任务并返回基地。
+
+\begin{table}[H]
+  \centering
+  \caption{问题三结果展示表（算法B固定 $N_0$ 的正式方案）}
+  \label{tab:q3-results}
+  \begin{tabularx}{0.98\textwidth}{c c >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X}
+    \toprule
+    测试算例 & 无人机数量 $N$ & 单架无人机最长工作时间 $T_{\max}$（h） & 单架无人机最短工作时间 $T_{\min}$（h） & $\delta=|T_{\max}-T_{\min}|$（h） \\
+    \midrule
+    Case 1 & 4 & 8.6111 & 8.5937 & 0.0174 \\
+    Case 2 & 2 & 13.1404 & 13.1401 & 0.0003 \\
+    Case 3 & 5 & 9.6280 & 9.5822 & 0.0458 \\
+    Case 4 & 4 & 10.9250 & 10.8597 & 0.0652 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+表中工作时间以小时表示并保留4位小数，最晚返回时刻则根据程序保存的未舍入秒级结果计算，因此直接使用表中四舍五入后的小时数换算时可能出现约1秒差异。
+
+\begin{table}[H]
+  \centering
+  \caption{固定 $N_0$ 时算法A与算法B的结果对比}
+  \label{tab:q3-ab-comparison}
+  \small
+  \begin{tabularx}{0.98\textwidth}{c c *{5}{>{\centering\arraybackslash}X}}
+    \toprule
+    算例 & $N_0$ & $T_{\max}^{A}$/h & $T_{\max}^{B,*}$/h & $T_{\max}^{B}$/h & $\delta^{A}$/h & $\delta^{B}$/h \\
+    \midrule
+    Case 1 & 4 & 8.6111 & 8.6111 & 8.6111 & 0.0174 & 0.0174 \\
+    Case 2 & 2 & 13.3779 & 13.1404 & 13.1404 & 0.0146 & 0.0003 \\
+    Case 3 & 5 & 9.6086 & 9.6086 & 9.6280 & 0.1237 & 0.0458 \\
+    Case 4 & 4 & 10.8711 & 10.8711 & 10.9250 & 0.6808 & 0.0652 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+表~\ref{tab:q3-ab-comparison} 中 $T_{\max}^{B,*}$ 为算法B第一阶段得到的效率基准，$T_{\max}^{B}$ 为第二阶段均衡后的正式值。Case 1 未发生实际管制冲突，两种算法结果一致。Case 2 中，空间绕飞与任务重排使完成时间由13.3779小时降至13.1404小时，必要等待由189.297分钟降至47.645分钟，同时极差降至约0.02分钟。Case 3、Case 4 的第二阶段分别在第一阶段最好完成时间上增加约0.20\%和0.50\%，均未超过0.5\%阈值，而极差分别缩小约63.0\%和90.4\%。这说明在严格限制效率损失后，算法B能显著改善固定机队下的工作负载均衡。
+
+\begin{table}[H]
+  \centering
+  \caption{固定 $N_0$ 时必要等待与绕行结果对比}
+  \label{tab:q3-wait-detour}
+  \begin{tabular}{c c c c}
+    \toprule
+    算例 & 算法A必要等待/min & 算法B必要等待/min & 算法B绕行航段数 \\
+    \midrule
+    Case 1 & 0.000 & 0.000 & 0 \\
+    Case 2 & 189.297 & 47.645 & 12 \\
+    Case 3 & 59.023 & 19.671 & 1 \\
+    Case 4 & 0.000 & 0.000 & 1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+表~\ref{tab:q3-wait-detour} 进一步表明，算法B并非单纯依靠延后任务改善可行性，而是利用空间绕行替代部分长时间等待。需要说明的是，两种算法的邻域规模、单次评价成本和总计算预算并不完全相同，因此表~\ref{tab:q3-ab-comparison}、\ref{tab:q3-wait-detour} 主要比较在本文既定求解流程下获得的最终方案质量，不把运行时间差异作为搜索效率优劣的严格证据。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{generated_figures/q3_case2_ab_routes.pdf}
+  \caption{Case 2中算法A与算法B的实际航迹对比（算法B橙色折线为绕行组成航段）}
+  \label{fig:q3-case2-ab-routes}
+\end{figure}
+
+图~\ref{fig:q3-case2-ab-routes} 由两套程序的已验证逐事件结果直接绘制。阴影圆表示管制区的空间范围，实际冲突仍由飞行通过时刻与管制时间窗联合判断；因此算法A的直线航迹在空间上穿圆并不必然违规，而是在时间冲突发生时等待后再通过。算法B则对其中部分冲突航段采用圆外折线，从而显著降低累计等待。
+
+正式方案中，Case 1--Case 4 的最晚返回时刻依次为16:36:39、21:08:25、17:37:40和18:55:29。Case 3 和 Case 4 在均衡阶段主动利用很小的完成时间容差换取更紧凑的工时分布；该取舍已由式~\eqref{eq:q3-two-stage} 明确限定，不属于任意增加等待。
+
+算法B的正式路线、逐事件时间表和12组敏感性结果保存于支撑材料 \texttt{result3.xlsx}，可复算的结构化结果保存于 \texttt{q3\_solution.json}；算法A的对照结果分别另存为 \texttt{result3\_algorithmA.xlsx} 和 \texttt{q3\_solution\_algorithmA.json}，避免两套程序和结果混淆。
+
+\section{模型检验与敏感性分析}
+针对前两问，本文采用“求解程序生成结果、独立校验器重新读取原始附件并复算”的方式检查结果一致性。校验器逐条检查基地是否只出现于路线首尾、同一物理点是否连续出现、I/II/III级巡检点是否分别完成3/2/1次有效巡检，并根据
+
+\[
+  T_k=\frac{D_k}{55}+\frac{m_k}{12}
+\]
+
+重新计算每架无人机的工作时间。其中，\(D_k\) 为实际飞行距离，\(m_k\) 为有效巡检次数。问题二还额外检查 \(N=N^{(1)}\)、等待时间为0以及 \(T_{\max}^{(2)}\leq T_{\max}^{(1)}+\varepsilon\)。四个算例均通过上述检查，JSON 与 Excel 汇总值和逐路线复算值一致。
+
+问题二主结果取 \(\varepsilon=0\)，这是对“保证总体完成时间尽可能短”的保守解释。当 \(\varepsilon>0\) 时，可允许极小的总体完成时间损失来换取进一步的均衡改善；但由于当前四个算例已经将极差控制在约1.43分钟以内，本文不在主结果中放宽该参数。
+
+\subsection{问题三独立可行性检验}
+
+问题三另由独立程序重新读取原始附件，并逐事件复核唯一任务副本、基地闭合、时间连续性、每条折线航段的穿圆时段、管制区内服务和非基地安全等待，同时核对 $T_{\max}$、$T_{\min}$、$\delta$ 及两阶段效率阈值。算法B在4个算例、每个算例3种机队规模下形成的12组结果全部通过验证。该结论证明输出方案满足程序所实现的全部约束，但不等同于对全局最优性的证明；独立验证程序见附录~\ref{lst:q3-enhanced-validator}，算法A的快速解析校验器见附录~\ref{lst:q3-fast-validator}。
+
+\clearpage
+\subsection{问题三机队规模敏感性}
+
+为考察题目对无人机数量未作明确限制时的结果变化，本文另取 $N=N_0,N_0+1,N_0+2$ 运行算法B。表~\ref{tab:q3-fleet-sensitivity} 仅用于敏感性分析，不替代表~\ref{tab:q3-results} 的固定 $N_0$ 正式方案。
+
+\begin{table}[H]
+  \centering
+  \caption{算法B在不同机队规模下的敏感性结果}
+  \label{tab:q3-fleet-sensitivity}
+  \scriptsize
+  \begin{tabularx}{0.99\textwidth}{c c *{5}{>{\centering\arraybackslash}X}}
+    \toprule
+    算例 & $N$ & $T_{\max}^{*}$/h & $T_{\max}$/h & $\delta$/h & 总等待/min & 单机最大等待/min \\
+    \midrule
+    Case 1 & 4 & 8.6111 & 8.6111 & 0.0174 & 0.000 & 0.000 \\
+    Case 1 & 5 & 8.5270 & 8.5270 & 0.0615 & 0.000 & 0.000 \\
+    Case 1 & 6 & 8.3513 & 8.3513 & 0.0732 & 0.000 & 0.000 \\
+    Case 2 & 2 & 13.1404 & 13.1404 & 0.0003 & 47.645 & 34.612 \\
+    Case 2 & 3 & 11.9325 & 11.9436 & 0.0081 & 448.214 & 233.441 \\
+    Case 2 & 4 & 11.0787 & 11.0969 & 0.0108 & 952.904 & 269.184 \\
+    Case 3 & 5 & 9.6086 & 9.6280 & 0.0458 & 19.671 & 19.671 \\
+    Case 3 & 6 & 9.5855 & 9.6241 & 0.0778 & 2.117 & 2.117 \\
+    Case 3 & 7 & 9.4650 & 9.4650 & 0.1435 & 0.000 & 0.000 \\
+    Case 4 & 4 & 10.8711 & 10.9250 & 0.0652 & 0.000 & 0.000 \\
+    Case 4 & 5 & 10.7858 & 10.7858 & 0.0169 & 1.048 & 1.048 \\
+    Case 4 & 6 & 10.6692 & 10.6692 & 0.0183 & 3.216 & 3.216 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+总体上，当前搜索得到的 $T_{\max}$ 随机队规模增加而下降，其中 Case 2 对增加无人机最敏感：由2架增加至3架和4架后，完成时间分别再缩短约71.8分钟和50.8分钟。表中的总等待是所有无人机等待时间之和，而 $T_{\max}$ 只由最晚返回的一架无人机决定；增机后更多并行路线进入管制时间窗，等待分散在多架无人机上，因而总等待增加并不必然导致系统完成时间增加。Case 2 的单机最大等待虽由34.612分钟增至233.441分钟和269.184分钟，但并行作业仍使最后返回时刻显著提前。$\delta$ 并不随 $N$ 单调变化，这是两阶段效率阈值、任务离散性和启发式搜索共同作用的结果。由于题目没有给出新增无人机成本或数量上限，不能仅凭该表定义无条件的“最优机队规模”，故仍以固定 $N_0$ 的方案作为正式答案。
+
+\section{模型评价与推广}
+\subsection{模型优点}
+本文将三级巡检次数要求转化为可核验的任务副本，在统一框架中处理机队规模、完成时间和负载均衡三个层次；问题三进一步以绝对时刻连接航段穿圆、圆内服务和安全等待约束。两阶段目标明确限制均衡优化造成的效率损失，独立校验器又从原始数据重新逐事件复算，使论文模型、程序输出和结果文件之间能够相互核对。算法A与算法B并列保留，也便于区分“直飞等待即可处理”的简单情形和“空间绕飞具有明显收益”的管制密集情形。
+
+\subsection{模型不足与改进}
+本文所得结果属于有限计算预算内的最好可行方案，尚未给出全局最优性证明。算法B取 $n_b=16$，对应22.5度的圆周角分辨率，在可见图规模与绕行精度之间作折中；虽然外偏半径保证采样弦不进入原禁飞圆，连续障碍最短路仍被离散近似。增加 $n_b$ 可提高空间分辨率，但会显著扩大时变图和候选边数量，后续可比较 $n_b=8,16,32$ 的完成时间与运行时间，或改用解析切线、自适应加密节点。其次，$\varepsilon_T=0.005$ 是效率与均衡之间的工程取舍，可进一步对 $\varepsilon_T=0,0.001,0.0025,0.005$ 做参数试验，绘制 $T_{\max}$--$\delta$ 权衡曲线。若实际系统还包含电量、速度波动或管制信息临时更新，则需扩展为带续航和不确定信息的滚动时域模型。
+
+% =============================================================
+% 参考文献：正式写作时取消下面三行注释，并在正文使用 \cite{键值}
+% =============================================================
+\section*{参考文献}
+\addcontentsline{toc}{section}{参考文献}
+\bibliographystyle{gbt7714-numerical}
+\bibliography{references}
+
+% =============================================================
+% AI 使用披露：必须位于参考文献之后，并按专项规定如实填写
+% =============================================================
+\section*{人工智能工具使用披露}
+\addcontentsline{toc}{section}{人工智能工具使用披露}
+本队在论文撰写和程序整理过程中使用了 OpenAI Codex（GPT-5系列模型，2026年8月访问）作为辅助工具，主要用于检查 LaTeX 结构与排版、梳理模型表述、辅助编写和调试 Python 程序、整理结果工作簿以及检查正文与程序输出的一致性。人工智能工具未直接替代建模决策和结果判定：题目数据、模型约束、算法参数及数值结论均由队员结合赛题逐项确认；问题一、问题二结果由独立校验模块复算，问题三全部12组“算例--机队规模”结果由独立逐事件验证器重新读取原始附件，检查任务次数、基地闭合、时间连续性、动态管制冲突和效率阈值。论文最终内容、引用、程序及提交文件均由队员人工审阅并承担责任。
+
+% =============================================================
+% 附录：正文之后；页数不限；继续显示控制号和连续页码
+% =============================================================
+\clearpage
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\titleformat{\section}{\centering\bfseries\fontsize{15pt}{20pt}\selectfont}
+  {附录\thesection\quad}{0pt}{}
+
+\section{支撑材料文件列表}
+\begin{longtable}{
+  p{0.05\textwidth}
+  >{\raggedright\arraybackslash\ttfamily\footnotesize}p{0.39\textwidth}
+  >{\raggedright\arraybackslash\footnotesize}p{0.46\textwidth}
+}
+  \toprule
+  序号 & 文件名 & 文件用途与对应论文位置 \\
+  \midrule
+  \endfirsthead
+  \toprule
+  序号 & 文件名 & 文件用途与对应论文位置 \\
+  \midrule
+  \endhead
+  1 & \path{question1/program/} & 问题一完整程序、配置、输入读取、精确模型、启发式求解和独立校验模块，对应正文5.2节 \\
+  2 & \path{question1/results/result1.xlsx} & 问题一四个算例的详细任务分配与巡检路线，对应表~\ref{tab:q1-results} \\
+  3 & \path{question1/results/solution.json} & 问题一完整结构化路线和求解状态，也是问题二唯一使用的问题一初始调度输入 \\
+  4 & \path{question2/program/q2_solver.py} & 固定问题一无人机数量和完成时间上界的负载均衡优化及独立校验程序，对应正文6.2节 \\
+  5 & \path{question2/results/result2.xlsx} & 问题二各无人机任务序列、飞行距离、巡检次数和工作时间，对应表~\ref{tab:q2-results} \\
+  6 & \path{question2/results/q2_solution.json} & 问题二可复算的完整结构化调度结果及随机搜索记录 \\
+  7 & \path{question3/program/q3_solver.py} & 问题三基准算法A：直飞、必要安全等待和任务序列优化，对应正文7.2节 \\
+  8 & \path{question3/program/q3_solver_enhanced.py} & 问题三改进算法B：时变可见图、空间绕飞和 $\varepsilon$-约束两阶段优化，对应正文7.2节 \\
+  9 & \path{question3/results/result3_algorithmA.xlsx} & 算法A固定 $N_0$ 的基准路线与逐事件结果，对应表~\ref{tab:q3-ab-comparison} \\
+  10 & \path{question3/results/q3_solution_algorithmA.json} & 算法A完整结构化基准结果及搜索记录 \\
+  11 & \path{question3/results/result3.xlsx} & 算法B正式方案和12组机队规模敏感性结果，对应表~\ref{tab:q3-results}、\ref{tab:q3-fleet-sensitivity} \\
+  12 & \path{question3/results/q3_solution.json} & 算法B完整结构化结果源，包含路线、事件时刻、两阶段搜索记录和独立验证状态 \\
+  13 & \path{README.md}\newline\path{requirements.txt} & 三问目录说明、运行命令和 Python 依赖环境 \\
+  \bottomrule
+\end{longtable}
+
+\noindent\textbf{提交说明：}支撑材料压缩包应包含上表列出的全部文件，并保证文件名、程序输出和论文中的表图一致；赛题提供的原始数据不必重复提交。
+
+\section{问题一完整算法流程}
+正文图~\ref{fig:q1-fleet-flow} 给出了无人机数量搜索的总体过程。固定无人机数量后，程序依次完成多起点初始路线构造、模拟退火搜索和确定性平衡修复，完整流程见图~\ref{fig:q1-route-flow}。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[
+    width=0.92\textwidth,
+    height=0.58\textheight,
+    keepaspectratio
+  ]{figures/q1_route_optimization_flowchart_revised.pdf}
+  \caption{固定无人机数量下的多起点路线优化流程}
+  \label{fig:q1-route-flow}
+\end{figure}
+
+\section{完整源程序}
+为保证计算结果可复现，本节应收入建模所使用的全部完整、可运行源程序。附录图~\ref{fig:q1-route-flow} 仅用于说明算法结构，不能替代源程序代码；相同程序文件还应放入单独提交的支撑材料压缩包。
+
+\lstinputlisting[
+  language=Python,
+  caption={问题一多无人机协同巡检路径优化主程序},
+  label={lst:q1-solver}
+]{submission_package/question1/program/run.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题一多起点启发式与路线优化模块}
+]{submission_package/question1/program/src/uav_q1/solver_engine.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题一固定无人机数量的精确模型模块}
+]{submission_package/question1/program/src/uav_q1/exact_milp.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题一独立结果校验模块}
+]{submission_package/question1/program/src/uav_q1/validation.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题一结果工作簿输出模块}
+]{submission_package/question1/program/src/uav_q1/excel_output.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题二固定完成时间上界的工作负载均衡完整源程序},
+  label={lst:q2-solver}
+]{submission_package/question2/program/q2_solver.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题三基准算法A完整源程序},
+  label={lst:q3-solver-a}
+]{submission_package/question3/program/q3_solver.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题三改进算法B完整源程序},
+  label={lst:q3-solver-b}
+]{submission_package/question3/program/q3_solver_enhanced.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题三基于包围盒预筛和解析相交的加速独立验证程序},
+  label={lst:q3-fast-validator}
+]{submission_package/question3/program/q3_fast_validator.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题三算法B的逐事件独立验证程序},
+  label={lst:q3-enhanced-validator}
+]{submission_package/question3/program/q3_enhanced_validator.py}
+
+\lstinputlisting[
+  language=Python,
+  caption={问题三Case 2算法A/B实际航迹对比图生成程序}
+]{submission_package/question3/program/make_q3_case2_comparison.py}
+
+\end{document}

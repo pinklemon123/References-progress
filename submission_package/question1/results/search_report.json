@@ -1,0 +1,99 @@
+{
+  "mode": "ten-minute",
+  "requested_total_seconds": 240.0,
+  "workers": 1,
+  "candidate_neighborhood_size": 24,
+  "gpu_used": false,
+  "cases": {
+    "Case2": {
+      "N": 2,
+      "lower_bound": {
+        "N": 2,
+        "service_hours": 11.583333333333332,
+        "mst_km": 112.19412779484492,
+        "repeated_degree_km": 156.82920275905212,
+        "cycle_cover_km": 163.8534393618313,
+        "aggregate_work_hours": 14.562486776275719,
+        "makespan_lower_bound_at_N": 7.2812433881378595,
+        "farthest_roundtrip_lower_bound_hours": 0.8979437203556375
+      },
+      "fleet_size_status": "PROVEN_MINIMUM",
+      "budget_seconds": 30.527834906026786,
+      "actual_seconds": 30.9364029999997,
+      "warm_start_Tmax": 7.58896136604038,
+      "resume_input_Tmax": 7.58896136604038,
+      "best_Tmax": 7.58896136604038,
+      "improvement_hours": 0.0,
+      "completed_starts_this_run": 18,
+      "completed_starts": 74
+    },
+    "Case4": {
+      "N": 4,
+      "lower_bound": {
+        "N": 4,
+        "service_hours": 15.166666666666666,
+        "mst_km": 518.8911817111592,
+        "repeated_degree_km": 687.3696769942134,
+        "cycle_cover_km": 725.3450247654674,
+        "aggregate_work_hours": 28.3547580260388,
+        "makespan_lower_bound_at_N": 7.0886895065097,
+        "farthest_roundtrip_lower_bound_hours": 3.284106387050517
+      },
+      "fleet_size_status": "PROVEN_MINIMUM",
+      "budget_seconds": 58.55709275000014,
+      "actual_seconds": 60.13257139999769,
+      "warm_start_Tmax": 8.684888135703508,
+      "resume_input_Tmax": 8.652867940814975,
+      "best_Tmax": 8.626308636809997,
+      "improvement_hours": 0.05857949889351133,
+      "completed_starts_this_run": 32,
+      "completed_starts": 137
+    },
+    "Case1": {
+      "N": 4,
+      "lower_bound": {
+        "N": 3,
+        "service_hours": 6.0,
+        "mst_km": 626.8312088666829,
+        "repeated_degree_km": 860.1162976292985,
+        "cycle_cover_km": 1065.6385894983164,
+        "aggregate_work_hours": 25.37524708178757,
+        "makespan_lower_bound_at_N": 8.45841569392919,
+        "farthest_roundtrip_lower_bound_hours": 6.473020271951979
+      },
+      "fleet_size_status": "FEASIBLE_CANDIDATE",
+      "budget_seconds": 46.14324631111231,
+      "actual_seconds": 46.25596130001941,
+      "warm_start_Tmax": 8.668313833543396,
+      "resume_input_Tmax": 8.611061939184689,
+      "best_Tmax": 8.611061939184689,
+      "improvement_hours": 0.057251894358707034,
+      "completed_starts_this_run": 90,
+      "completed_starts": 408
+    },
+    "Case3": {
+      "N": 5,
+      "lower_bound": {
+        "N": 4,
+        "service_hours": 11.666666666666666,
+        "mst_km": 701.3138228450067,
+        "repeated_degree_km": 956.9542906476202,
+        "cycle_cover_km": 1088.3129730746978,
+        "aggregate_work_hours": 31.454175268024805,
+        "makespan_lower_bound_at_N": 7.863543817006201,
+        "farthest_roundtrip_lower_bound_hours": 5.088270365458431
+      },
+      "fleet_size_status": "FEASIBLE_CANDIDATE",
+      "budget_seconds": 57.5573454000114,
+      "actual_seconds": 58.57959990002564,
+      "warm_start_Tmax": 8.287629729774915,
+      "resume_input_Tmax": 8.287629729774915,
+      "best_Tmax": 8.287629729774915,
+      "improvement_hours": 0.0,
+      "completed_starts_this_run": 51,
+      "completed_starts": 220
+    }
+  },
+  "elapsed_seconds": 196.04692609998165,
+  "validation": "PASSED"
+}

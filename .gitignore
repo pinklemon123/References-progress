@@ -1,0 +1,27 @@
+# LaTeX build products
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.xdv
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local temporary and review artifacts
+tmp/
+*.inspect.ndjson
+*.zip
+main_before_q2.tex
+example.tex
+q1_flowcharts_preview.pdf
+q3_code_and_results_review.zip
+q3_two_algorithms_review_package.zip
+低空经济背景下的多无人机协同巡检路径优化问题/
+低空经济背景下的多无人机协同巡检路径优化问题_第10版/

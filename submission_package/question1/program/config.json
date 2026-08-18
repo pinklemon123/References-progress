@@ -1,0 +1,18 @@
+{
+  "speed_kmh": 55.0,
+  "coordinate_unit_km": 0.1,
+  "service_minutes_per_visit": 5.0,
+  "maximum_work_hours": 9.0,
+  "level_required_visits": {"I": 3, "II": 2, "III": 1},
+  "random_seed": 9187,
+  "quality_seeds": {"fast": 4, "standard": 10, "thorough": 24},
+  "heuristic_time_limit_seconds_per_n": 300,
+  "exact_time_limit_seconds_per_n": 600,
+  "exact_mip_relative_gap": 0.0,
+  "maximum_n_increment": 6,
+  "parallel_workers": 4,
+  "candidate_neighborhood_size": 24,
+  "ten_minute_total_seconds": 600,
+  "ten_minute_save_reserve_seconds": 45,
+  "ten_minute_case_weights": {"Case1": 1.0, "Case2": 0.65, "Case3": 1.25, "Case4": 1.25}
+}
