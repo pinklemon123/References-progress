@@ -13,6 +13,8 @@
 \usepackage{titlesec}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{fvextra}
+\usepackage{multicol}
 \usepackage{xurl}
 \usepackage{gbt7714}
 \usepackage{hyperref}
@@ -95,7 +97,23 @@
 }
 \lstset{style=paperstyle}
 
-\newcommand{\placeholder}[1]{\noindent\textcolor{gray}{【#1】}}
+% 附录中的源程序采用可断行的双栏逐文件排版。
+\newcommand{\CodeFile}[2]{%
+  \par\medskip
+  \noindent\textbf{#1}\par
+  \noindent\textbf{路径：}\nolinkurl{#2}\par\smallskip
+  \VerbatimInput[
+    fontsize=\tiny,
+    numbers=left,
+    numbersep=3pt,
+    frame=lines,
+    framesep=1mm,
+    rulecolor=\color{black!30},
+    breaklines=true,
+    breakanywhere=true,
+    tabsize=4
+  ]{#2}
+}
 
 \begin{document}
 \pagenumbering{arabic}
@@ -135,10 +153,51 @@
 \pagestyle{frontmatter}
 \thispagestyle{frontmatter}
 
+\begin{center}
+  \vspace*{0.35cm}
+  {\bfseries\fontsize{18pt}{24pt}\selectfont 目\quad 录\par}
+\end{center}
+\vspace{0.45cm}
+
+% 本页按定稿的实际页码手工编排，不读取 .toc 文件。
+\newcommand{\TOCSection}[3]{%
+  \noindent\makebox[2.3em][l]{\bfseries #1、}%
+  \textbf{#2}\dotfill\textbf{#3}\par}
+\newcommand{\TOCSubsection}[3]{%
+  \noindent\hspace*{2.3em}\makebox[2.8em][l]{#1}#2\dotfill#3\par}
 \begingroup
-  \setcounter{tocdepth}{2}
-  \renewcommand{\contentsname}{目\quad 录}
-  \tableofcontents
+  \setlength{\parskip}{0.08em}
+  \linespread{1.02}\selectfont
+  \TOCSection{一}{问题重述}{3}
+  \TOCSubsection{1.1}{问题背景}{3}
+  \TOCSubsection{1.2}{问题要求}{3}
+  \TOCSection{二}{问题分析}{3}
+  \TOCSubsection{2.1}{问题一分析}{3}
+  \TOCSubsection{2.2}{问题二分析}{4}
+  \TOCSubsection{2.3}{问题三分析}{4}
+  \TOCSection{三}{模型假设}{4}
+  \TOCSection{四}{主要符号说明}{5}
+  \TOCSection{五}{问题一的模型建立与求解}{5}
+  \TOCSubsection{5.1}{模型建立}{5}
+  \TOCSubsection{5.2}{求解方法}{8}
+  \TOCSubsection{5.3}{计算结果与分析}{10}
+  \TOCSection{六}{问题二的模型建立与求解}{11}
+  \TOCSubsection{6.1}{递进模型与均衡目标}{11}
+  \TOCSubsection{6.2}{均衡优化算法}{12}
+  \TOCSubsection{6.3}{计算结果与分析}{12}
+  \TOCSection{七}{问题三的模型建立与求解}{14}
+  \TOCSubsection{7.1}{动态管制模型}{14}
+  \TOCSubsection{7.2}{求解方法}{15}
+  \TOCSubsection{7.3}{计算结果与分析}{17}
+  \TOCSection{八}{模型检验与敏感性分析}{19}
+  \TOCSubsection{8.1}{问题一、问题二结果复核}{19}
+  \TOCSubsection{8.2}{问题三独立可行性检验}{20}
+  \TOCSubsection{8.3}{问题三机队规模敏感性分析}{20}
+  \TOCSection{九}{模型评价与推广}{21}
+  \TOCSubsection{9.1}{模型优点}{21}
+  \TOCSubsection{9.2}{模型不足与改进}{21}
+  \noindent\textbf{参考文献}\dotfill\textbf{23}\par
+  \noindent\textbf{人工智能工具使用披露}\dotfill\textbf{25}\par
 \endgroup
 
 % =============================================================
@@ -436,7 +495,7 @@ x_{uv}^k=
 \subsection{求解方法}
 
 \noindent\textbf{（1）求解流程与初始解。}
-问题一按照式~\eqref{eq:q1-lex-objective} 的优先关系分两阶段求解：先从数量下界 \(N_{\mathrm{LB}}\) 出发搜索满足9小时限制的无人机数量，再固定 \(N\) 优化最大工作时间 \(T_{\max}\)。对每个给定的 \(N\)，程序采用多个随机起点，交替使用加权 K-means 和极角扫描划分任务区域，并以最近邻法和 2-opt 构造各区域的初始闭合路线。对于重复巡检任务，按式~\eqref{eq:q1-insertion-cost} 计算插入增量，并排除与同一物理点相邻的位置：
+问题一按照式~\eqref{eq:q1-lex-objective} 的优先关系分两阶段求解：先从数量下界 \(N_{\mathrm{LB}}\) 出发搜索满足9小时限制的无人机数量，再固定 \(N\) 优化最大工作时间 \(T_{\max}\)。对每个给定的 \(N\)，程序采用多个随机起点，交替使用加权 K-means 和极角扫描划分任务区域，并以最近邻法和 2-opt 构造各区域的初始闭合路线；前者用于空间聚类，后者用于消除明显的交叉与绕行\cite{lloyd1982,croes1958}。对于重复巡检任务，按式~\eqref{eq:q1-insertion-cost} 计算插入增量，并排除与同一物理点相邻的位置：
 
 \begin{equation}
   \Delta d=d_{ai}+d_{ib}-d_{ab}.
@@ -458,7 +517,7 @@ x_{uv}^k=
 \FloatBarrier
 
 \noindent\textbf{（2）路线优化与结果校验。}
-在初始方案上，程序通过任务迁移、任务交换和 2-opt 构造邻域，并采用模拟退火搜索降低 \(T_{\max}\)。对使目标值增加 \(\Delta T>0\) 的候选方案，以概率
+在初始方案上，程序通过任务迁移、任务交换和 2-opt 构造邻域，并采用模拟退火搜索降低 \(T_{\max}\)\cite{kirkpatrick1983}。对使目标值增加 \(\Delta T>0\) 的候选方案，以概率
 
 \begin{equation}
   P=\exp\left(-\frac{\Delta T}{\tau}\right)
@@ -707,7 +766,7 @@ x_{uv}^k=
 
 算法B保留算法A的解析冲突检查和最早时刻递推，并在航段评价中增加空间绕飞选择。记 $n_b$ 为每个有效管制圆的外偏候选节点数，本次取 $n_b=16$；$\rho$ 为附加安全裕度，本次取 $\rho=0$；$\widehat R_r$ 为外偏采样半径。为避免候选节点落在原禁飞边界上，并防止相邻采样点之间的弦切入圆内，程序采用 $\widehat R_r=(R_r+\rho)\sec(\pi/n_b)+10^{-6}$。即使 $\rho=0$，几何外偏量 $R_r[\sec(\pi/16)-1]+10^{-6}$ 仍为正。
 
-本文将管制圆视为闭圆盘，圆周边界同样属于管制区域；几何判断对判别式和点到线段距离采用统一数值容差，相切按接触管制圆处理。候选节点仅用于构造时变可见图，任意两节点间的可见边仍须在原半径 $R_r$ 下通过解析线段--圆盘检查，不满足安全条件的边均予删除。算法同时比较“安全等待后直飞”和“沿外偏节点改道”两类通行方式，并对最终折线路径的每一小段重新进行时空联合验证。由于时变可见图只使用有限个外偏节点，所得路线是连续圆障碍最短路的离散近似，本文不声称其为连续空间中的全局最短路径。
+本文将管制圆视为闭圆盘，圆周边界同样属于管制区域；几何判断对判别式和点到线段距离采用统一数值容差，相切按接触管制圆处理。候选节点仅用于构造时变可见图，该类图搜索方法可将已知障碍环境中的无碰撞路径转化为图上的路径问题\cite{lozanoperez1979}。任意两节点间的可见边仍须在原半径 $R_r$ 下通过解析线段--圆盘检查，不满足安全条件的边均予删除。算法同时比较“安全等待后直飞”和“沿外偏节点改道”两类通行方式，并对最终折线路径的每一小段重新进行时空联合验证。由于时变可见图只使用有限个外偏节点，所得路线是连续圆障碍最短路的离散近似，本文不声称其为连续空间中的全局最短路径。
 
 外层搜索除迁移、交换和片段反转外，还加入跨路线片段交换，并将问题二路线、算法A路线及随机扰动路线共同作为初始解。为体现总体完成时间优先，并允许在近似最优效率范围内进一步改善负载均衡性，算法B采用基于 $\varepsilon$-约束的近似字典序两阶段准则
 
@@ -870,10 +929,9 @@ T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
 本文所得结果属于有限计算预算内的最好可行方案，尚未给出全局最优性证明。算法B取 $n_b=16$，对应22.5度的圆周角分辨率，在可见图规模与绕行精度之间作折中；虽然外偏半径保证采样弦不进入原禁飞圆，连续障碍最短路仍被离散近似。增加 $n_b$ 可提高空间分辨率，但会显著扩大时变图和候选边数量，后续可比较 $n_b=8,16,32$ 的完成时间与运行时间，或改用解析切线、自适应加密节点。其次，$\varepsilon_T=0.005$ 是效率与均衡之间的工程取舍，可进一步对 $\varepsilon_T=0,0.001,0.0025,0.005$ 做参数试验，绘制 $T_{\max}$--$\delta$ 权衡曲线。若实际系统还包含电量、速度波动或管制信息临时更新，则需扩展为带续航和不确定信息的滚动时域模型。
 
 % =============================================================
-% 参考文献：正式写作时取消下面三行注释，并在正文使用 \cite{键值}
+% 参考文献采用 GB/T 7714—2015 顺序编码制，由 references.bib 统一生成。
 % =============================================================
 \section*{参考文献}
-\addcontentsline{toc}{section}{参考文献}
 \bibliographystyle{gbt7714-numerical}
 \bibliography{references}
 
@@ -881,126 +939,94 @@ T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
 % AI 使用披露：必须位于参考文献之后，并按专项规定如实填写
 % =============================================================
 \section*{人工智能工具使用披露}
-\addcontentsline{toc}{section}{人工智能工具使用披露}
 本队在论文撰写和程序整理过程中使用了 OpenAI Codex（GPT-5系列模型，2026年8月访问）作为辅助工具，主要用于检查 LaTeX 结构与排版、梳理模型表述、辅助编写和调试 Python 程序、整理结果工作簿以及检查正文与程序输出的一致性。人工智能工具未直接替代建模决策和结果判定：题目数据、模型约束、算法参数及数值结论均由队员结合赛题逐项确认；问题一、问题二结果由独立校验模块复算，问题三全部12组“算例--机队规模”结果由独立逐事件验证器重新读取原始附件，检查任务次数、基地闭合、时间连续性、动态管制冲突和效率阈值。论文最终内容、引用、程序及提交文件均由队员人工审阅并承担责任。
 
 % =============================================================
-% 附录：正文之后；页数不限；继续显示控制号和连续页码
+% 附录：与正文共用同一 TeX 文件，页码自然连续。
 % =============================================================
 \clearpage
 \appendix
+\linespread{1.25}\selectfont
+\Urlmuskip=0mu plus 1mu
 \renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thesubsection}{\Alph{section}.\arabic{subsection}}
 \titleformat{\section}{\centering\bfseries\fontsize{15pt}{20pt}\selectfont}
   {附录\thesection\quad}{0pt}{}
 
 \section{支撑材料文件列表}
+
+支撑材料以 ZIP 压缩包单独提交。为便于评阅和复核，表~\ref{tab:file-list}仅列出文件类别、核心入口及用途；完整目录结构、运行命令、依赖版本和随机参数见压缩包根目录的 \texttt{README.md}。赛题提供的原始附件不重复列入自主数据资料。
+
+\small
 \begin{longtable}{
-  p{0.05\textwidth}
-  >{\raggedright\arraybackslash\ttfamily\footnotesize}p{0.39\textwidth}
-  >{\raggedright\arraybackslash\footnotesize}p{0.46\textwidth}
+  >{\centering\arraybackslash}p{0.06\textwidth}
+  >{\raggedright\arraybackslash}p{0.40\textwidth}
+  >{\raggedright\arraybackslash}p{0.43\textwidth}
 }
+  \caption{支撑材料文件列表}\label{tab:file-list}\\
   \toprule
-  序号 & 文件名 & 文件用途与对应论文位置 \\
+  序号 & 文件或目录 & 内容及用途 \\
   \midrule
   \endfirsthead
+  \multicolumn{3}{c}{表\thetable（续）}\\
   \toprule
-  序号 & 文件名 & 文件用途与对应论文位置 \\
+  序号 & 文件或目录 & 内容及用途 \\
   \midrule
   \endhead
-  1 & \path{question1/program/} & 问题一完整程序、配置、输入读取、精确模型、启发式求解和独立校验模块，对应正文5.2节 \\
-  2 & \path{question1/results/result1.xlsx} & 问题一四个算例的详细任务分配与巡检路线，对应表~\ref{tab:q1-results} \\
-  3 & \path{question1/results/solution.json} & 问题一完整结构化路线和求解状态，也是问题二唯一使用的问题一初始调度输入 \\
-  4 & \path{question2/program/q2_solver.py} & 固定问题一无人机数量和完成时间上界的负载均衡优化及独立校验程序，对应正文6.2节 \\
-  5 & \path{question2/results/result2.xlsx} & 问题二各无人机任务序列、飞行距离、巡检次数和工作时间，对应表~\ref{tab:q2-results} \\
-  6 & \path{question2/results/q2_solution.json} & 问题二可复算的完整结构化调度结果及随机搜索记录 \\
-  7 & \path{question3/program/q3_solver.py} & 问题三基准算法A：直飞、必要安全等待和任务序列优化，对应正文7.2节 \\
-  8 & \path{question3/program/q3_solver_enhanced.py} & 问题三改进算法B：时变可见图、空间绕飞和 $\varepsilon$-约束两阶段优化，对应正文7.2节 \\
-  9 & \path{question3/results/result3_algorithmA.xlsx} & 算法A固定 $N_0$ 的基准路线与逐事件结果，对应表~\ref{tab:q3-ab-comparison} \\
-  10 & \path{question3/results/q3_solution_algorithmA.json} & 算法A完整结构化基准结果及搜索记录 \\
-  11 & \path{question3/results/result3.xlsx} & 算法B正式方案和12组机队规模敏感性结果，对应表~\ref{tab:q3-results}、\ref{tab:q3-fleet-sensitivity} \\
-  12 & \path{question3/results/q3_solution.json} & 算法B完整结构化结果源，包含路线、事件时刻、两阶段搜索记录和独立验证状态 \\
-  13 & \path{README.md}\newline\path{requirements.txt} & 三问目录说明、运行命令和 Python 依赖环境 \\
   \bottomrule
+  \endlastfoot
+
+  1 & \nolinkurl{README.md}、各问题 \nolinkurl{README.md} & 总体目录、运行环境、运行顺序、输入输出与结果复现说明。\\
+  2 & \nolinkurl{requirements.txt}、\nolinkurl{environment.yml}、\nolinkurl{config.json} & Python依赖、Conda环境及问题一搜索参数。\\
+
+  3 & \nolinkurl{question1/program/run.py} & 问题一统一运行入口：机队规模搜索、路线优化、结果输出与复核。\\
+  4 & \nolinkurl{question1/program/src/uav_q1/} & 问题一启发式求解、精确模型、独立校验及Excel输出模块；完整代码见附录B。\\
+  5 & \nolinkurl{question1/results/} & 问题一正式工作簿、结构化路线和搜索记录。\\
+
+  6 & \nolinkurl{question2/program/q2_solver.py} & 问题二负载均衡求解与独立校验程序；完整代码见附录C。\\
+  7 & \nolinkurl{question2/results/} & 问题二工作簿、结构化方案、汇总指标和逐架路线。\\
+
+  8 & \nolinkurl{question3/program/q3_solver.py} & 问题三算法A：直飞、必要等待与路线优化。\\
+  9 & \nolinkurl{question3/program/q3_solver_enhanced.py} & 问题三算法B：时变可见图、空间绕飞与两阶段优化。\\
+  10 & \nolinkurl{question3/program/q3_fast_validator.py}、\nolinkurl{q3_enhanced_validator.py} & 算法A快速校验与算法B逐事件独立复核；完整代码见附录D。\\
+  11 & \nolinkurl{question3/results/} & 算法A对照结果、算法B正式结果及机队规模敏感性结果。\\
+
+  12 & \nolinkurl{generated_figures/}、各问题辅助绘图与工作簿构建程序 & 论文图件、结果整理和格式转换文件，仅作为电子支撑材料提交。\\
+  13 & \nolinkurl{AI_tool_usage_details.pdf} & 人工智能工具名称、用途、人工修改和核验情况。\\
 \end{longtable}
+\normalsize
 
-\noindent\textbf{提交说明：}支撑材料压缩包应包含上表列出的全部文件，并保证文件名、程序输出和论文中的表图一致；赛题提供的原始数据不必重复提交。
+\noindent\textbf{结果口径：}问题三正式方案采用算法B，固定问题一最终采用的机队规模 $N_0=(4,2,5,4)$；算法A仅作基准对照，$N_0+1$、$N_0+2$ 仅用于敏感性分析。全部正式结果均由独立程序复核。验证通过仅说明方案满足本文实现的约束，不代表已经证明全局最优。
 
-\section{问题一完整算法流程}
-正文图~\ref{fig:q1-fleet-flow} 给出了无人机数量搜索的总体过程。固定无人机数量后，程序依次完成多起点初始路线构造、模拟退火搜索和确定性平衡修复，完整流程见图~\ref{fig:q1-route-flow}。
+\section{问题一源程序}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[
-    width=0.92\textwidth,
-    height=0.58\textheight,
-    keepaspectratio
-  ]{figures/q1_route_optimization_flowchart_revised.pdf}
-  \caption{固定无人机数量下的多起点路线优化流程}
-  \label{fig:q1-route-flow}
-\end{figure}
+以下五个文件共同构成问题一完整程序，运行入口为 \texttt{run.py}。测试脚本、环境安装脚本、说明文档和预计算结果仅放入电子支撑材料。
 
-\section{完整源程序}
-为保证计算结果可复现，本节应收入建模所使用的全部完整、可运行源程序。附录图~\ref{fig:q1-route-flow} 仅用于说明算法结构，不能替代源程序代码；相同程序文件还应放入单独提交的支撑材料压缩包。
+\begin{multicols*}{2}
+\CodeFile{问题一统一运行入口}{submission_package/question1/program/run.py}
+\CodeFile{问题一启发式求解核心模块}{submission_package/question1/program/src/uav_q1/solver_engine.py}
+\CodeFile{问题一固定机队规模精确模型}{submission_package/question1/program/src/uav_q1/exact_milp.py}
+\CodeFile{问题一独立结果校验模块}{submission_package/question1/program/src/uav_q1/validation.py}
+\CodeFile{问题一工作簿输出模块}{submission_package/question1/program/src/uav_q1/excel_output.py}
+\end{multicols*}
 
-\lstinputlisting[
-  language=Python,
-  caption={问题一多无人机协同巡检路径优化主程序},
-  label={lst:q1-solver}
-]{submission_package/question1/program/run.py}
+\section{问题二源程序}
 
-\lstinputlisting[
-  language=Python,
-  caption={问题一多起点启发式与路线优化模块}
-]{submission_package/question1/program/src/uav_q1/solver_engine.py}
+问题二求解、结果复算及CSV输出均集中在同一程序中；用于生成论文图件和最终Excel版式的辅助脚本仅放入电子支撑材料。
 
-\lstinputlisting[
-  language=Python,
-  caption={问题一固定无人机数量的精确模型模块}
-]{submission_package/question1/program/src/uav_q1/exact_milp.py}
+\begin{multicols*}{2}
+\CodeFile{问题二负载均衡求解与校验程序}{submission_package/question2/program/q2_solver.py}
+\end{multicols*}
 
-\lstinputlisting[
-  language=Python,
-  caption={问题一独立结果校验模块}
-]{submission_package/question1/program/src/uav_q1/validation.py}
+\section{问题三源程序}
 
-\lstinputlisting[
-  language=Python,
-  caption={问题一结果工作簿输出模块}
-]{submission_package/question1/program/src/uav_q1/excel_output.py}
+以下收入算法A、算法B及两套独立验证程序。算法B直接调用算法A文件中的数据结构和基础时空冲突函数，因此二者共同构成完整可运行程序。绘图、结果筛选和工作簿格式转换脚本仅放入电子支撑材料。
 
-\lstinputlisting[
-  language=Python,
-  caption={问题二固定完成时间上界的工作负载均衡完整源程序},
-  label={lst:q2-solver}
-]{submission_package/question2/program/q2_solver.py}
-
-\lstinputlisting[
-  language=Python,
-  caption={问题三基准算法A完整源程序},
-  label={lst:q3-solver-a}
-]{submission_package/question3/program/q3_solver.py}
-
-\lstinputlisting[
-  language=Python,
-  caption={问题三改进算法B完整源程序},
-  label={lst:q3-solver-b}
-]{submission_package/question3/program/q3_solver_enhanced.py}
-
-\lstinputlisting[
-  language=Python,
-  caption={问题三基于包围盒预筛和解析相交的加速独立验证程序},
-  label={lst:q3-fast-validator}
-]{submission_package/question3/program/q3_fast_validator.py}
-
-\lstinputlisting[
-  language=Python,
-  caption={问题三算法B的逐事件独立验证程序},
-  label={lst:q3-enhanced-validator}
-]{submission_package/question3/program/q3_enhanced_validator.py}
-
-\lstinputlisting[
-  language=Python,
-  caption={问题三Case 2算法A/B实际航迹对比图生成程序}
-]{submission_package/question3/program/make_q3_case2_comparison.py}
+\begin{multicols*}{2}
+\CodeFile{问题三算法A主程序}{submission_package/question3/program/q3_solver.py}
+\CodeFile{问题三算法B主程序}{submission_package/question3/program/q3_solver_enhanced.py}
+\CodeFile{问题三快速独立校验程序}{submission_package/question3/program/q3_fast_validator.py}
+\CodeFile{问题三算法B逐事件独立验证程序}{submission_package/question3/program/q3_enhanced_validator.py}
+\end{multicols*}
 
 \end{document}
