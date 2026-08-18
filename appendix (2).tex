@@ -1,0 +1,132 @@
+\documentclass[UTF8,a4paper,12pt]{ctexart}
+
+% 与正文分开编译，最后在 PDF 层合并。
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,longtable,array}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{fvextra}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\newcommand{\TeamControlNumber}{TJMML2026393}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{15pt}
+\fancyhead[R]{\small 队伍控制号：\TeamControlNumber}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 正文当前结束于第25页；正文页数变化后只需修改此处。
+\setcounter{page}{26}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\linespread{1.25}
+\Urlmuskip=0mu plus 1mu
+
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thesubsection}{\Alph{section}.\arabic{subsection}}
+\titleformat{\section}{\centering\bfseries\fontsize{15pt}{20pt}\selectfont}
+  {附录\thesection\quad}{0pt}{}
+
+\newcommand{\CodeFile}[2]{%
+  \par\medskip
+  \noindent\textbf{#1}\par
+  \noindent\textbf{路径：}\nolinkurl{#2}\par\smallskip
+  \VerbatimInput[
+    fontsize=\tiny,
+    numbers=left,
+    numbersep=3pt,
+    frame=lines,
+    framesep=1mm,
+    rulecolor=\color{black!30},
+    breaklines=true,
+    breakanywhere=true,
+    tabsize=4
+  ]{#2}
+}
+
+\begin{document}
+\appendix
+
+\section{支撑材料文件列表}
+
+支撑材料以 ZIP 压缩包单独提交。为便于评阅和复核，表~\ref{tab:file-list}仅列出文件类别、核心入口及用途；完整目录结构、运行命令、依赖版本和随机参数见压缩包根目录的 \texttt{README.md}。赛题提供的原始附件不重复列入自主数据资料。
+
+\small
+\begin{longtable}{
+  >{\centering\arraybackslash}p{0.06\textwidth}
+  >{\raggedright\arraybackslash}p{0.40\textwidth}
+  >{\raggedright\arraybackslash}p{0.43\textwidth}
+}
+  \caption{支撑材料文件列表}\label{tab:file-list}\\
+  \toprule
+  序号 & 文件或目录 & 内容及用途 \\
+  \midrule
+  \endfirsthead
+  \multicolumn{3}{c}{表\thetable（续）}\\
+  \toprule
+  序号 & 文件或目录 & 内容及用途 \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+
+  1 & \nolinkurl{README.md}、各问题 \nolinkurl{README.md} & 总体目录、运行环境、运行顺序、输入输出与结果复现说明。\\
+  2 & \nolinkurl{requirements.txt}、\nolinkurl{environment.yml}、\nolinkurl{config.json} & Python依赖、Conda环境及问题一搜索参数。\\
+
+  3 & \nolinkurl{question1/program/run.py} & 问题一统一运行入口：机队规模搜索、路线优化、结果输出与复核。\\
+  4 & \nolinkurl{question1/program/src/uav_q1/} & 问题一启发式求解、精确模型、独立校验及Excel输出模块；完整代码见附录B。\\
+  5 & \nolinkurl{question1/results/} & 问题一正式工作簿、结构化路线和搜索记录。\\
+
+  6 & \nolinkurl{question2/program/q2_solver.py} & 问题二负载均衡求解与独立校验程序；完整代码见附录C。\\
+  7 & \nolinkurl{question2/results/} & 问题二工作簿、结构化方案、汇总指标和逐架路线。\\
+
+  8 & \nolinkurl{question3/program/q3_solver.py} & 问题三算法A：直飞、必要等待与路线优化。\\
+  9 & \nolinkurl{question3/program/q3_solver_enhanced.py} & 问题三算法B：时变可见图、空间绕飞与两阶段优化。\\
+  10 & \nolinkurl{question3/program/q3_fast_validator.py}、\nolinkurl{q3_enhanced_validator.py} & 算法A快速校验与算法B逐事件独立复核；完整代码见附录D。\\
+  11 & \nolinkurl{question3/results/} & 算法A对照结果、算法B正式结果及机队规模敏感性结果。\\
+
+  12 & \nolinkurl{generated_figures/}、各问题辅助绘图与工作簿构建程序 & 论文图件、结果整理和格式转换文件，仅作为电子支撑材料提交。\\
+  13 & \nolinkurl{AI工具使用详情.pdf} & 人工智能工具名称、用途、人工修改和核验情况。\\
+\end{longtable}
+\normalsize
+
+\noindent\textbf{结果口径：}问题三正式方案采用算法B，固定问题一最终采用的机队规模 $N_0=(4,2,5,4)$；算法A仅作基准对照，$N_0+1$、$N_0+2$ 仅用于敏感性分析。全部正式结果均由独立程序复核。验证通过仅说明方案满足本文实现的约束，不代表已经证明全局最优。
+
+\section{问题一源程序}
+
+以下五个文件共同构成问题一完整程序，运行入口为 \texttt{run.py}。测试脚本、环境安装脚本、说明文档和预计算结果仅放入电子支撑材料。
+
+\begin{multicols*}{2}
+\CodeFile{问题一统一运行入口}{submission_package/question1/program/run.py}
+\CodeFile{问题一启发式求解核心模块}{submission_package/question1/program/src/uav_q1/solver_engine.py}
+\CodeFile{问题一固定机队规模精确模型}{submission_package/question1/program/src/uav_q1/exact_milp.py}
+\CodeFile{问题一独立结果校验模块}{submission_package/question1/program/src/uav_q1/validation.py}
+\CodeFile{问题一工作簿输出模块}{submission_package/question1/program/src/uav_q1/excel_output.py}
+\end{multicols*}
+
+\section{问题二源程序}
+
+问题二求解、结果复算及CSV输出均集中在同一程序中；用于生成论文图件和最终Excel版式的辅助脚本仅放入电子支撑材料。
+
+\begin{multicols*}{2}
+\CodeFile{问题二负载均衡求解与校验程序}{submission_package/question2/program/q2_solver.py}
+\end{multicols*}
+
+\section{问题三源程序}
+
+以下收入算法A、算法B及两套独立验证程序。算法B直接调用算法A文件中的数据结构和基础时空冲突函数，因此二者共同构成完整可运行程序。绘图、结果筛选和工作簿格式转换脚本仅放入电子支撑材料。
+
+\begin{multicols*}{2}
+\CodeFile{问题三算法A主程序}{submission_package/question3/program/q3_solver.py}
+\CodeFile{问题三算法B主程序}{submission_package/question3/program/q3_solver_enhanced.py}
+\CodeFile{问题三快速独立校验程序}{submission_package/question3/program/q3_fast_validator.py}
+\CodeFile{问题三算法B逐事件独立验证程序}{submission_package/question3/program/q3_enhanced_validator.py}
+\end{multicols*}
+
+\end{document}
