@@ -26,8 +26,6 @@ uav_q1_program/
 ├─ input/
 │  ├─ 附件1.xlsx
 │  └─ result1_template.xlsx
-├─ data/
-│  └─ precomputed_solution.json
 ├─ docs/
 │  ├─ MODEL.md                    # 两阶段模型和完整 MILP
 │  └─ ALGORITHM.md                # 搜索、证明状态和复现方法
@@ -38,7 +36,7 @@ uav_q1_program/
 │  └─ validation.py
 ├─ tests/
 │  ├─ test_exact_small.py
-│  └─ test_precomputed.py
+│  └─ test_final_solution.py
 └─ outputs/
    ├─ result1.xlsx
    └─ solution.json
@@ -52,21 +50,17 @@ uav_q1_program/
 - 不需要 GPU；
 - 主要依赖：NumPy、pandas、SciPy/HiGHS、scikit-learn、openpyxl。
 
-Windows PowerShell：
+Windows PowerShell（不需要激活虚拟环境）：
 
 ```powershell
-cd G:\uav_q1_program
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+cd G:\lunwen2\References-progress-submit\submission_package
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements-search.txt
 ```
 
-若 PowerShell 禁止激活脚本，可先执行：
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
-```
+若电脑没有 Python 3.12，不要指定 `py -3.12`；先运行 `py -0p`，再使用已有的
+3.10、3.11、3.12 或 3.13。直接调用 `.venv` 中的 `python.exe` 不受执行策略影响。
 
 Linux/macOS：
 
@@ -100,7 +94,7 @@ $env:MKL_NUM_THREADS = "1"
 和累计耗时。结果单独保存到 `outputs_10min/`，不会覆盖原来的 `outputs/`：
 
 - `solution.json`：完整路线与时间；
-- `result1.xlsx`：完整调度表；
+- `result1.xlsx`：官方模板格式的逐架无人机路线表；
 - `search_report.json`：严格下界、热启动值、每次改进、搜索耗时和最终校验状态。
 
 `--workers` 建议从 4 开始。若电脑同时运行其他重负载程序，可改为 2；候选邻域一般保持
@@ -118,7 +112,7 @@ $env:MKL_NUM_THREADS = "1"
 严格从理论下界开始，启发式找解，必要时用 MILP 判断：
 
 ```powershell
-python run.py --mode solve --engine hybrid --quality thorough
+python run.py --mode search --engine hybrid --quality thorough
 ```
 
 程序对每个 Case 执行：
@@ -137,7 +131,7 @@ python run.py --mode solve --engine hybrid --quality thorough
 ### 快速调试
 
 ```powershell
-python run.py --mode solve --engine heuristic --quality fast
+python run.py --mode search --engine heuristic --quality fast
 ```
 
 启发式搜索失败不等于不可行，因此这种模式得到的数量可能只是“当前找到的可行上界”。
@@ -145,7 +139,7 @@ python run.py --mode solve --engine heuristic --quality fast
 ### 精确模式
 
 ```powershell
-python run.py --mode solve --engine exact
+python run.py --mode search --engine exact
 ```
 
 附件 1 展开后分别有 72、139、140、182 个任务副本，完整 MILP 可能耗时较长。可以在 `config.json` 修改：
@@ -162,10 +156,13 @@ python run.py --mode solve --engine exact
 ## 4. 复现已有可行解
 
 ```powershell
-python run.py --mode reproduce
+python run.py --mode reproduce-final
 ```
 
-该模式读取已有路线、重新计算全部距离与时间、验证巡检次数和重复规则，并生成结果文件。已有的 `4,2,5,4` 结果是可行方案，不因复现通过就自动成为严格的 $N_{\min}$。
+该模式读取相邻 `results/solution.json` 中的论文正式路线，重新计算全部距离与时间、
+验证巡检次数和重复规则，并按赛题模板生成结果文件。`--mode reproduce` 保留为同义
+兼容写法，不再读取旧预计算结果。已有的 `4,2,5,4` 结果是可行方案，不因复现通过
+就自动成为严格的 $N_{\min}$。
 
 ## 5. 求解状态
 

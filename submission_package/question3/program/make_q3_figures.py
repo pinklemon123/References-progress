@@ -126,7 +126,7 @@ def flow_figure():
     ys = [222, 145, 68]
     left = ["读取任务副本与管制区", "统一8:00时间原点\n处理零时长Z8", "解析线段-圆相交区间"]
     middle = ["构造航段禁用出发区间", "计算最早可行出发\n及必要安全等待", "复算飞行、服务与返回时刻"]
-    right = ["以问题二路线为初始解", "变邻域与模拟退火\n词典序优化(Tmax, δ)", "独立复核并输出\nJSON、CSV、result3.xlsx"]
+    right = ["以问题二路线为初始解", "变邻域与模拟退火\n词典序优化(Tmax, δ)", "独立复核并输出\nJSON、CSV；正式表统一生成"]
     for x, texts in zip(cols, [left, middle, right]):
         for y, text in zip(ys, texts):
             box(c, x, y, 170, 46, text)

@@ -1,0 +1,4 @@
+-r requirements.txt
+scipy>=1.12,<2
+scikit-learn>=1.4,<2
+

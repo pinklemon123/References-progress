@@ -11,6 +11,8 @@
 - `submission_package/question1/`：问题一程序、输入与结果。
 - `submission_package/question2/`：问题二程序与结果。
 - `submission_package/question3/`：问题三算法 A、算法 B、独立验证器与结果。
+- `submission_package/reproduce_all.py`：校验三问正式路线并按赛题模板生成三个结果文件。
+- `submission_package/运行说明.md`：Windows 环境与复现说明。
 
 ## 问题三结果口径
 
@@ -28,5 +30,9 @@ submission_package/question3/program/q3_solver.py
 submission_package/question3/program/q3_solver_enhanced.py
 submission_package/question3/program/q3_enhanced_validator.py
 ```
+
+默认复现入口是 `submission_package/reproduce_all.py`。它不进行耗时的随机搜索，
+而是独立校验保存路线并生成赛题模板格式的 `result1.xlsx`、`result2.xlsx`、
+`result3.xlsx`。重新搜索属于可选操作，可能得到不同但同样可行的路线。
 
 论文使用 XeLaTeX、BibTeX，并采用 `gbt7714-numerical` 参考文献样式。目录、文献和交叉引用需要多轮编译。

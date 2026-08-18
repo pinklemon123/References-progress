@@ -41,4 +41,4 @@ python q2_solver.py `
 - `summary.csv`：题目要求的汇总字段；
 - `comparison.csv`：问题一、问题二工作时间极差对比；
 - `CaseX_routes.csv`：逐架无人机路线；
-- `result2.xlsx`：由同一 JSON 数据生成的提交用工作簿。
+- 正式 `result2.xlsx`：由提交包根目录的 `reproduce_all.py` 按赛题模板生成。

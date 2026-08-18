@@ -525,7 +525,13 @@ x_{uv}^k=
   \label{eq:q1-sa-probability}
 \end{equation}
 
-予以接受，其中 \(\tau\) 为温度参数。退火结束后，再针对最长路线执行确定性平衡修复，并保留全部随机起点中 \(T_{\max}\) 最小的方案。若当前 \(N\) 找到满足 \(T_{\max}\leq9\) 的路线，则记录结果并继续优化；否则令 \(N\leftarrow N+1\)。最后独立复算各路线，检查巡检次数、同点连续访问、基地闭合和9小时限制，并将详细调度方案写入 \texttt{result1.xlsx}。固定无人机数量下的完整优化流程及相关源程序见附录B。
+予以接受，其中 \(\tau\) 为温度参数。退火结束后，再针对最长路线执行确定性平衡修复，并保留全部随机起点中 \(T_{\max}\) 最小的方案。若当前 \(N\) 找到满足 \(T_{\max}\leq9\) 的路线，则记录结果并继续优化；否则令 \(N\leftarrow N+1\)。最后独立复算各路线，检查巡检次数、同点连续访问、基地闭合和9小时限制。
+各架无人机的正式巡检点序列按赛题模板写入
+\texttt{result1.xlsx}；基地闭合路线、飞行距离、巡检次数、
+工作时间和校验结果保存在
+\nolinkurl{question1/results/solution.json} 中，
+扩展工作簿仅作为复核材料保存。
+固定无人机数量下的完整优化流程及相关源程序见附录B。
 
 各算法操作的作用归纳于表~\ref{tab:q1-method-role}。
 
@@ -710,7 +716,14 @@ x_{uv}^k=
 
 由表~\ref{tab:q2-comparison} 和图~\ref{fig:q2-workload-comparison} 可见，问题二所得方案在保持无人机数量不变的基础上，进一步缩小了不同无人机之间的工作时间极差。按照程序输出的未舍入数据计算，Case 1、Case 3 和 Case 4 的极差分别下降72.1\%、41.8\%和62.6\%；Case 2 在问题一中已经较为均衡，极差仍由约0.69分钟下降至0.62分钟，下降9.7\%。优化后四个算例的工作时间极差均不超过1.43分钟，说明所构造方案具有较好的负载均衡性。与此同时，Case 2--Case 4 的 \(T_{\max}\) 还略有下降，Case 1 保持原完成时间上界，说明均衡改善没有以牺牲总体完成时间为代价。
 
-正文不逐行展开较长的巡检点序列。四个算例中每架无人机的基地闭合路线、飞行距离、巡检次数和工作时间均保存在支撑材料 \texttt{result2.xlsx}，可复算的完整结构化路线保存在 \texttt{q2\_solution.json}；相应程序入口为 \texttt{q2\_solver.py}。
+正文不逐行展开较长的巡检点序列。四个算例中每架无人机的正式巡检点序列
+按赛题模板保存于 \texttt{result2.xlsx}；基地闭合路线、飞行距离、
+巡检次数、工作时间和目标函数值保存在
+\nolinkurl{question2/results/q2_solution.json} 及相应CSV文件中。
+扩展工作簿仅作为复核材料保存于
+\nolinkurl{audit_materials/result2_detailed.xlsx}。
+问题二程序入口为
+\nolinkurl{question2/program/q2_solver.py}。
 
 \section{问题三的模型建立与求解}
 \subsection{模型建立}
@@ -873,7 +886,17 @@ T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
 
 正式方案中，Case 1--Case 4 的最晚返回时刻依次为16:36:39、21:08:25、17:37:40和18:55:29。Case 3 和 Case 4 在均衡阶段主动利用很小的完成时间容差换取更紧凑的工时分布；该取舍已由式~\eqref{eq:q3-two-stage} 明确限定，不属于任意增加等待。
 
-算法B的正式路线、逐事件时间表和12组敏感性结果保存于支撑材料 \texttt{result3.xlsx}，可复算的结构化结果保存于 \texttt{q3\_solution.json}；算法A的对照结果分别另存为 \texttt{result3\_algorithmA.xlsx} 和 \texttt{q3\_solution\_algorithmA.json}，避免两套程序和结果混淆。
+算法B在固定机队规模 $N_0$ 下的正式巡检点序列按赛题模板保存于
+\texttt{result3.xlsx}。算法B的逐事件时间表、固定机队正式结果及
+12组机队规模敏感性结果保存在
+\nolinkurl{question3/results/q3_solution.json}；
+算法A对照结果保存在
+\nolinkurl{question3/results/q3_solution_algorithmA.json}。
+两种算法的扩展工作簿分别保存于
+\nolinkurl{audit_materials/result3_detailed_algorithmA.xlsx}
+和
+\nolinkurl{audit_materials/result3_detailed_algorithmB.xlsx}，
+仅用于结果复核，不作为赛题正式结果文件，避免两套程序和结果混淆。
 
 \section{模型检验与敏感性分析}
 针对前两问，本文采用“求解程序生成结果、独立校验器重新读取原始附件并复算”的方式检查结果一致性。校验器逐条检查基地是否只出现于路线首尾、同一物理点是否连续出现、I/II/III级巡检点是否分别完成3/2/1次有效巡检，并根据
@@ -908,8 +931,8 @@ T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
     Case 1 & 5 & 8.5270 & 8.5270 & 0.0615 & 0.000 & 0.000 \\
     Case 1 & 6 & 8.3513 & 8.3513 & 0.0732 & 0.000 & 0.000 \\
     Case 2 & 2 & 13.1404 & 13.1404 & 0.0003 & 47.645 & 34.612 \\
-    Case 2 & 3 & 11.9325 & 11.9436 & 0.0081 & 448.214 & 233.441 \\
-    Case 2 & 4 & 11.0787 & 11.0969 & 0.0108 & 952.904 & 269.184 \\
+    Case 2 & 3 & 11.9325 & 11.9436 & 0.0081 & 448.214 & 233.445 \\
+    Case 2 & 4 & 11.0787 & 11.0969 & 0.0108 & 952.904 & 269.180 \\
     Case 3 & 5 & 9.6086 & 9.6280 & 0.0458 & 19.671 & 19.671 \\
     Case 3 & 6 & 9.5855 & 9.6241 & 0.0778 & 2.117 & 2.117 \\
     Case 3 & 7 & 9.4650 & 9.4650 & 0.1435 & 0.000 & 0.000 \\
@@ -920,7 +943,7 @@ T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
   \end{tabularx}
 \end{table}
 
-总体上，当前搜索得到的 $T_{\max}$ 随机队规模增加而下降，其中 Case 2 对增加无人机最敏感：由2架增加至3架和4架后，完成时间分别再缩短约71.8分钟和50.8分钟。表中的总等待是所有无人机等待时间之和，而 $T_{\max}$ 只由最晚返回的一架无人机决定；增机后更多并行路线进入管制时间窗，等待分散在多架无人机上，因而总等待增加并不必然导致系统完成时间增加。Case 2 的单机最大等待虽由34.612分钟增至233.441分钟和269.184分钟，但并行作业仍使最后返回时刻显著提前。$\delta$ 并不随 $N$ 单调变化，这是两阶段效率阈值、任务离散性和启发式搜索共同作用的结果。由于题目没有给出新增无人机成本或数量上限，不能仅凭该表定义无条件的“最优机队规模”，故仍以固定 $N_0$ 的方案作为正式答案。
+总体上，当前搜索得到的 $T_{\max}$ 随机队规模增加而下降，其中 Case 2 对增加无人机最敏感：由2架增加至3架和4架后，完成时间分别再缩短约71.8分钟和50.8分钟。表中的总等待是所有无人机等待时间之和，而 $T_{\max}$ 只由最晚返回的一架无人机决定；增机后更多并行路线进入管制时间窗，等待分散在多架无人机上，因而总等待增加并不必然导致系统完成时间增加。Case 2 的单机最大等待虽由34.612分钟增至233.445分钟和269.180分钟，但并行作业仍使最后返回时刻显著提前。$\delta$ 并不随 $N$ 单调变化，这是两阶段效率阈值、任务离散性和启发式搜索共同作用的结果。由于题目没有给出新增无人机成本或数量上限，不能仅凭该表定义无条件的“最优机队规模”，故仍以固定 $N_0$ 的方案作为正式答案。
 
 \section{模型评价与推广}
 \subsection{模型优点}
@@ -1016,22 +1039,22 @@ T_{\max}^{B,*}&=\min_{S\in\Omega_3(N_0)}T_{\max}(S),\\
   \endlastfoot
 
   1 & \nolinkurl{README.md}、各问题 \nolinkurl{README.md} & 总体目录、运行环境、运行顺序、输入输出与结果复现说明。\\
-  2 & \nolinkurl{requirements.txt}、\nolinkurl{environment.yml}、\nolinkurl{config.json} & Python依赖、Conda环境及问题一搜索参数。\\
+  2 & \nolinkurl{requirements.txt} & Python依赖、Conda环境及问题一搜索参数。\\
+  3 & \nolinkurl{reproduce_all.py}、\nolinkurl{formal_excel.py}、\nolinkurl{result1.xlsx}、\nolinkurl{result2.xlsx}、\nolinkurl{result3.xlsx}& 三问正式结果统一校验、赛题模板生成程序及三个唯一正式结果文件。\\
+  4 & \nolinkurl{question1/program/run.py} & 问题一统一运行入口：机队规模搜索、路线优化、结果输出与复核。\\
+  5 & \nolinkurl{question1/program/src/uav_q1/} & 问题一启发式求解、精确模型、独立校验及Excel输出模块；完整代码见附录B。\\
+  6 & \nolinkurl{question1/results/} & 问题一正式结构化路线、搜索状态和校验记录。\\
 
-  3 & \nolinkurl{question1/program/run.py} & 问题一统一运行入口：机队规模搜索、路线优化、结果输出与复核。\\
-  4 & \nolinkurl{question1/program/src/uav_q1/} & 问题一启发式求解、精确模型、独立校验及Excel输出模块；完整代码见附录B。\\
-  5 & \nolinkurl{question1/results/} & 问题一正式工作簿、结构化路线和搜索记录。\\
+  7 & \nolinkurl{question2/program/q2_solver.py} & 问题二负载均衡求解与独立校验程序；完整代码见附录C。\\
+  8 & \nolinkurl{question2/results/} & 问题二结构化方案、汇总指标和逐架路线。\\
 
-  6 & \nolinkurl{question2/program/q2_solver.py} & 问题二负载均衡求解与独立校验程序；完整代码见附录C。\\
-  7 & \nolinkurl{question2/results/} & 问题二工作簿、结构化方案、汇总指标和逐架路线。\\
+  9 & \nolinkurl{question3/program/q3_solver.py} & 问题三算法A：直飞、必要等待与路线优化。\\
+  10 & \nolinkurl{question3/program/q3_solver_enhanced.py} & 问题三算法B：时变可见图、空间绕飞与两阶段优化。\\
+  11 & \nolinkurl{question3/program/q3_fast_validator.py}、\nolinkurl{question3/program/q3_enhanced_validator.py} & 算法A快速校验与算法B逐事件独立复核；完整代码见附录D。\\
+  12 & \nolinkurl{question3/results/} & 算法A对照结果、算法B正式结果及机队规模敏感性结果。\\
 
-  8 & \nolinkurl{question3/program/q3_solver.py} & 问题三算法A：直飞、必要等待与路线优化。\\
-  9 & \nolinkurl{question3/program/q3_solver_enhanced.py} & 问题三算法B：时变可见图、空间绕飞与两阶段优化。\\
-  10 & \nolinkurl{question3/program/q3_fast_validator.py}、\nolinkurl{q3_enhanced_validator.py} & 算法A快速校验与算法B逐事件独立复核；完整代码见附录D。\\
-  11 & \nolinkurl{question3/results/} & 算法A对照结果、算法B正式结果及机队规模敏感性结果。\\
-
-  12 & \nolinkurl{generated_figures/}、各问题辅助绘图与工作簿构建程序 & 论文图件、结果整理和格式转换文件，仅作为电子支撑材料提交。\\
-  13 & \nolinkurl{AI_tool_usage_details.pdf} & 人工智能工具名称、用途、人工修改和核验情况。\\
+  13 & \nolinkurl{generated_figures/}、各问题辅助绘图与工作簿构建程序 & 论文图件、结果整理和格式转换文件，仅作为电子支撑材料提交。\\
+  14 & \nolinkurl{AI_tool_usage_details.pdf} & 人工智能工具名称、用途、人工修改和核验情况。\\
 \end{longtable}
 \normalsize
 

@@ -9,4 +9,6 @@
 | Case3 | 5 | 8.2876 | 8.2468 | 当前可行候选 |
 | Case4 | 4 | 8.6263 | 8.6058 | 已达到严格下界 |
 
-`solution.json` 是问题二唯一使用的问题一调度输入；旧版 `Downloads/result2.xlsx` 未参与计算。
+`solution.json` 是问题二唯一使用的问题一调度输入。正式 `result1.xlsx` 由
+`submission_package/reproduce_all.py` 写到提交包根目录；本目录不再放置同名的扩展
+工作簿，避免与官方模板混淆。旧预计算结果仅在 `audit_materials` 留档，不参与默认复现。

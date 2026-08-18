@@ -13,6 +13,11 @@
 # Python caches
 __pycache__/
 *.py[cod]
+.venv/
+
+# Re-search outputs (formal root result1/2/3.xlsx remain trackable)
+submission_package/question1/program/outputs/
+submission_package/question1/program/outputs_10min/
 
 # Local temporary and review artifacts
 tmp/
@@ -27,3 +32,9 @@ q3_code_and_results_review.zip
 q3_two_algorithms_review_package.zip
 低空经济背景下的多无人机协同巡检路径优化问题/
 低空经济背景下的多无人机协同巡检路径优化问题_第10版/
+
+# Historical/intermediate audit results
+/submission_package/audit_materials/q1_precomputed_solution_old.json
+/submission_package/audit_materials/q3_enhanced_solution_intermediate.json
+/submission_package/audit_materials/q3_summary_enhanced_intermediate.csv
+/submission_package/audit_materials/result3_enhanced_intermediate.xlsx

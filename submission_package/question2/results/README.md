@@ -9,4 +9,6 @@
 | Case3 | 5 | 8.2824 | 8.2586 | 0.0238 | 41.8% |
 | Case4 | 4 | 8.6197 | 8.6120 | 0.0077 | 62.6% |
 
-`q2_solution.json` 保存完整可复算路线；`result2.xlsx` 是根据同一 JSON 生成的提交用工作簿。
+`q2_solution.json` 保存完整可复算路线。正式 `result2.xlsx` 由
+`submission_package/reproduce_all.py` 按赛题模板写到提交包根目录；扩展工作簿移入
+`audit_materials`，不再与正式文件同名。

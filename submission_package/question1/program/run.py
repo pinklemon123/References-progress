@@ -1,4 +1,4 @@
-"""问题一统一入口：复现预计算结果，或从附件 1 重新优化。"""
+"""问题一统一入口：复核论文正式结果，或从附件 1 重新搜索。"""
 from __future__ import annotations
 
 import argparse
@@ -122,7 +122,7 @@ def strong_lower_bound(df: pd.DataFrame, limit_h: float) -> dict:
     }
 
 
-def routes_from_precomputed(df: pd.DataFrame, case: dict) -> list[list[int]]:
+def routes_from_saved(df: pd.DataFrame, case: dict) -> list[list[int]]:
     id_to_index = {int(row.Point_ID): i for i, row in df.iterrows()}
     routes = []
     for route in case["routes"]:
@@ -220,12 +220,12 @@ def run_ten_minute_plan(
     started = time.monotonic()
     deadline = started + float(total_seconds)
     reserve = min(float(config.get("ten_minute_save_reserve_seconds", 45)), total_seconds * 0.2)
-    precomputed = json.loads((ROOT / "data" / "precomputed_solution.json").read_text(encoding="utf-8"))
-    validate_all(input_path, precomputed, config)
+    saved_results = json.loads((ROOT.parent / "results" / "solution.json").read_text(encoding="utf-8"))
+    validate_all(input_path, saved_results, config)
     if resume_from is not None:
         resumed = json.loads(resume_from.read_text(encoding="utf-8"))
         validate_all(input_path, resumed, config)
-        precomputed = resumed
+        saved_results = resumed
         print(f"续搜方案独立校验通过：{resume_from}", flush=True)
     else:
         print("已有 4,2,5,4 方案独立校验通过；开始强下界与并行改进。", flush=True)
@@ -246,11 +246,11 @@ def run_ten_minute_plan(
     for position, case_name in enumerate(process_order):
         df = pd.read_excel(book, sheet_name=case_name)
         lower = strong_lower_bound(df, float(config["maximum_work_hours"]))
-        initial = precomputed[case_name]
+        initial = saved_results[case_name]
         n_uav = int(initial["N"])
         if n_uav < int(lower["N"]):
             raise AssertionError(f"{case_name}: 已有 N={n_uav} 小于严格下界 {lower['N']}")
-        warm_routes = routes_from_precomputed(df, initial)
+        warm_routes = routes_from_saved(df, initial)
         prior_history = list(initial.get("search_history", []))
         original_warm_tmax = float(initial.get("warm_start_Tmax", initial["Tmax"]))
 
@@ -310,8 +310,15 @@ def run_ten_minute_plan(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="多无人机协同巡检问题一求解器")
-    parser.add_argument("--mode", choices=["reproduce", "solve", "ten-minute"], default="reproduce",
-                        help="reproduce 复现；solve 完整搜索；ten-minute 按统一短时预算并行改进")
+    parser.add_argument(
+        "--mode",
+        choices=["reproduce", "reproduce-final", "search", "solve", "ten-minute"],
+        default="reproduce-final",
+        help=(
+            "reproduce/reproduce-final 复核论文正式路线；search/solve 重新搜索；"
+            "ten-minute 按统一短时预算并行改进"
+        ),
+    )
     parser.add_argument("--quality", choices=["fast", "standard", "thorough"], default="standard")
     parser.add_argument("--engine", choices=["heuristic", "hybrid", "exact"], default="hybrid",
                         help="heuristic 仅搜索；hybrid 搜索失败后精确判定；exact 仅精确 MILP")
@@ -329,9 +336,9 @@ def main() -> None:
 
     config = load_config()
     report = None
-    if args.mode == "reproduce":
-        results = json.loads((ROOT / "data" / "precomputed_solution.json").read_text(encoding="utf-8"))
-    elif args.mode == "solve":
+    if args.mode in {"reproduce", "reproduce-final"}:
+        results = json.loads((ROOT.parent / "results" / "solution.json").read_text(encoding="utf-8"))
+    elif args.mode in {"search", "solve"}:
         results = solve_from_scratch(args.input, args.quality, args.engine, config)
     else:
         total_seconds = float(

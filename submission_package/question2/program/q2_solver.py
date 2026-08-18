@@ -1,6 +1,6 @@
 """问题二：固定问题一无人机数量与完成时间上界的负载均衡优化。
 
-Python 求解器只输出 JSON/CSV；result2.xlsx 由 build_result2.mjs 根据同一 JSON 生成。
+求解器输出 JSON/CSV；正式 result2.xlsx 由提交包根目录 reproduce_all.py 生成。
 工作时间仅包含实际飞行与有效巡检服务，不允许用等待时间改善均衡指标。
 """
 

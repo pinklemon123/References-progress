@@ -56,19 +56,19 @@
 `hybrid`（推荐）先运行启发式；若没有找到 9 小时内方案，再调用精确 MILP：
 
 ```powershell
-python run.py --mode solve --engine hybrid --quality thorough
+python run.py --mode search --engine hybrid --quality thorough
 ```
 
 `heuristic` 只运行多起点启发式，速度快，但最终数量可能只是可行候选：
 
 ```powershell
-python run.py --mode solve --engine heuristic --quality thorough
+python run.py --mode search --engine heuristic --quality thorough
 ```
 
 `exact` 逐个 N 运行完整 MILP，适合较小算例或延长求解时间后进行证明：
 
 ```powershell
-python run.py --mode solve --engine exact
+python run.py --mode search --engine exact
 ```
 
 精确求解时限在 `config.json` 的 `exact_time_limit_seconds` 中设置。只有状态真正返回 `OPTIMAL` 时才能称为固定 N 下的全局最优。
